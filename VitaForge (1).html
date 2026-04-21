@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VitaForge 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09090f;--bg2:#101018;--bg3:#16161f;--bg4:#1c1c28;--bg5:#22222f;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--text:#eeeef5;--muted:#6a6a80;--accent:#7c6fff;--accent2:#ff6b9d;--green:#3ddc84;--amber:#ffbe47;--red:#ff5050;--blue:#4db8ff;--purple:#c084fc;--teal:#2dd4bf;--font:'Syne',sans-serif;--mono:'DM Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.5}
+#root{display:grid;grid-template-rows:52px 1fr;grid-template-columns:220px 1fr 280px;height:100vh;overflow:hidden}
+header{grid-column:1/-1;display:flex;align-items:center;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);gap:10px;z-index:20;flex-shrink:0}
+#sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:1px}
+#main{overflow-y:auto;padding:18px 20px;background:var(--bg)}
+#panel{background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.logo{font-size:17px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.hstat{display:flex;flex-direction:column;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 9px;min-width:58px}
+.hstat-v{font-size:13px;font-weight:700}
+.hstat-l{font-size:9px;color:var(--muted);font-family:var(--mono)}
+#money-display{margin-left:auto;font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green);white-space:nowrap}
+#char-name{font-size:13px;color:var(--muted);white-space:nowrap}
+.age-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;font-family:var(--mono)}
+.btn-year{background:linear-gradient(135deg,var(--accent),#9333ea);border:none;color:#fff;font-family:var(--font);font-weight:700;font-size:12px;padding:6px 14px;border-radius:7px;cursor:pointer;transition:all 0.18s;white-space:nowrap;flex-shrink:0}
+.btn-year:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(124,111,255,0.45)}
+.nav-sep{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;padding:10px 8px 3px;font-family:var(--mono)}
+.nav-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 8px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;transition:all 0.12s;text-align:left}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.nav-btn.active{background:rgba(124,111,255,0.18);color:#b8b0ff;border:1px solid rgba(124,111,255,0.25)}
+.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.card-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-family:var(--mono);margin-bottom:10px}
+h2{font-size:19px;font-weight:800;letter-spacing:-0.4px;margin-bottom:3px}
+h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.stat-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.stat-name{font-size:11px;color:var(--muted);width:68px;flex-shrink:0;font-family:var(--mono)}
+.stat-bar{flex:1;height:5px;background:var(--bg5);border-radius:3px;overflow:hidden}
+.stat-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
+.stat-val{font-size:11px;font-weight:700;font-family:var(--mono);width:24px;text-align:right}
+.btn{display:block;width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);font-family:var(--font);font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;transition:all 0.12s;text-align:left;margin-bottom:5px}
+.btn:hover:not(:disabled){background:var(--bg5);border-color:rgba(255,255,255,0.18);transform:translateX(2px)}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+.btn-g{border-color:rgba(61,220,132,0.3);color:var(--green)}.btn-g:hover:not(:disabled){background:rgba(61,220,132,0.08)}
+.btn-r{border-color:rgba(255,80,80,0.3);color:var(--red)}.btn-r:hover:not(:disabled){background:rgba(255,80,80,0.08)}
+.btn-b{border-color:rgba(77,184,255,0.3);color:var(--blue)}.btn-b:hover:not(:disabled){background:rgba(77,184,255,0.08)}
+.btn-a{border-color:rgba(255,190,71,0.3);color:var(--amber)}.btn-a:hover:not(:disabled){background:rgba(255,190,71,0.08)}
+.btn-p{border-color:rgba(192,132,252,0.3);color:var(--purple)}.btn-p:hover:not(:disabled){background:rgba(192,132,252,0.08)}
+.btn-acc{background:rgba(124,111,255,0.15);border-color:rgba(124,111,255,0.35);color:#c0b8ff}.btn-acc:hover:not(:disabled){background:rgba(124,111,255,0.25)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.metric{background:var(--bg4);border-radius:7px;padding:8px;text-align:center}
+.metric-v{font-size:14px;font-weight:700;font-family:var(--mono)}
+.metric-l{font-size:9px;color:var(--muted);margin-top:1px;font-family:var(--mono)}
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:12px;font-family:var(--mono);letter-spacing:0.04em}
+.badge-g{background:rgba(61,220,132,0.15);color:var(--green);border:1px solid rgba(61,220,132,0.25)}
+.badge-r{background:rgba(255,80,80,0.15);color:var(--red);border:1px solid rgba(255,80,80,0.25)}
+.badge-b{background:rgba(77,184,255,0.15);color:var(--blue);border:1px solid rgba(77,184,255,0.25)}
+.badge-a{background:rgba(255,190,71,0.15);color:var(--amber);border:1px solid rgba(255,190,71,0.25)}
+.badge-p{background:rgba(192,132,252,0.15);color:var(--purple);border:1px solid rgba(192,132,252,0.25)}
+.badge-acc{background:rgba(124,111,255,0.15);color:#c0b8ff;border:1px solid rgba(124,111,255,0.25)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:22px;max-width:480px;width:95%;max-height:85vh;overflow-y:auto;animation:slideUp 0.2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:5px}
+.modal-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.65}
+.log-item{padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;gap:6px;line-height:1.4}
+.log-item:last-child{border:none}
+.log-age{font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0;font-weight:500;width:22px}
+.log-text{flex:1}
+.log-item.good .log-text{color:var(--green)}
+.log-item.bad .log-text{color:var(--red)}
+.log-item.info .log-text{color:var(--blue)}
+.log-item.warn .log-text{color:var(--amber)}
+.log-item.event .log-text{color:var(--purple)}
+.asset-card{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.asset-info{flex:1;min-width:0}
+.asset-name{font-size:12px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.asset-detail{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.mkt-item{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:7px}
+.mkt-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.mkt-title{font-size:12px;font-weight:600}
+.mkt-price{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);flex-shrink:0;margin-left:8px}
+.mkt-meta{font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:5px}
+.tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:5px 11px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font);font-weight:500;transition:all 0.12s}
+.tab:hover{background:var(--bg3);color:var(--text)}
+.tab.active{background:rgba(124,111,255,0.2);color:#c0b8ff;border-color:rgba(124,111,255,0.35)}
+.floor-plan{background:var(--bg5);border:1px solid var(--border);border-radius:6px;padding:8px;margin:6px 0;font-family:var(--mono);font-size:10px;color:var(--muted);white-space:pre;line-height:1.3;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)}
+th{text-align:left;color:var(--muted);padding:5px 6px;border-bottom:1px solid var(--border);font-weight:500;font-size:10px}
+td{padding:5px 6px;border-bottom:1px solid var(--border)}
+tr:last-child td{border:none}
+input[type=text],input[type=number],select{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color 0.15s;width:100%}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--bg3)}
+.sep{height:1px;background:var(--border);margin:10px 0}
+.inline-btn{padding:5px 10px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);font-family:var(--font);font-size:11px;border-radius:6px;cursor:pointer;transition:all 0.12s;white-space:nowrap}
+.inline-btn:hover:not(:disabled){background:var(--bg5)}
+.inline-btn:disabled{opacity:0.35;cursor:not-allowed}
+.tag{display:inline-block;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:10px;font-family:var(--mono);margin:1px}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#start-screen{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;align-items:center;justify-content:center;overflow-y:auto}
+.start-card{max-width:560px;width:95%;padding:36px 32px;text-align:center}
+.start-logo{font-size:52px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:8px;letter-spacing:-2px}
+.start-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.7}
+.city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:20px;text-align:left}
+.city-btn{padding:9px 11px;border:1px solid var(--border2);background:var(--bg3);border-radius:8px;cursor:pointer;transition:all 0.15s;font-family:var(--font);color:var(--muted);font-size:11px}
+.city-btn:hover,.city-btn.sel{background:rgba(124,111,255,0.2);border-color:rgba(124,111,255,0.4);color:var(--text)}
+.city-btn .city-name{font-weight:700;font-size:12px;display:block;color:var(--text)}
+.go-btn{background:linear-gradient(135deg,var(--accent),#9333ea);border:none;color:#fff;font-family:var(--font);font-weight:700;font-size:15px;padding:13px 36px;border-radius:10px;cursor:pointer;transition:all 0.2s}
+.go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,111,255,0.5)}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:20px;text-align:left}
+.feat{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--muted)}
+.feat strong{color:var(--text);display:block;margin-bottom:1px;font-size:12px}
+.notice{background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--red);margin-bottom:10px}
+.notice-g{background:rgba(61,220,132,0.08);border:1px solid rgba(61,220,132,0.2);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--green);margin-bottom:10px}
+.notice-a{background:rgba(255,190,71,0.08);border:1px solid rgba(255,190,71,0.2);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--amber);margin-bottom:10px}
+</style>
+</head>
+<body>
+<div id="start-screen">
+  <div class="start-card">
+    <div class="start-logo">VitaForge</div>
+    <p class="start-sub">Simulateur de vie ultra-réaliste — naissance, famille, empire entrepreneurial, fraude fiscale, F1...</p>
+    <div class="feat-grid">
+      <div class="feat"><strong>🧬 Vie & Famille</strong>Mariage, enfants, descendance jouable</div>
+      <div class="feat"><strong>🏢 Multi-entreprises</strong>Holding, SCI, LBO, valorisation</div>
+      <div class="feat"><strong>🚗 Marché renouvelé</strong>500+ assets, yachts, jets privés</div>
+      <div class="feat"><strong>🏎️ Course automobile</strong>Rallye, F1, racheter une écurie</div>
+      <div class="feat"><strong>📊 Compta réelle</strong>IS, TVA, URSSAF, fraude, blanchiment</div>
+      <div class="feat"><strong>🏠 Immobilier</strong>Plans 2D, chambres, SdB, emplacements</div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">📍 Ville de départ : <strong style="color:var(--text)">⚔️ Caen, Normandie</strong></p>
+    <button class="go-btn" onclick="startGame()">Commencer ma vie ▶</button>
+  </div>
+</div>
+<div id="root">
+  <header>
+    <div class="logo">VitaForge</div>
+    <div id="age-badge" class="age-badge">0 ans</div>
+    <div id="char-name" class="char-name">—</div>
+    <div id="header-stats" style="display:flex;gap:5px"></div>
+    <div id="money-display" class="money-display">0 €</div>
+    <button class="btn-year" onclick="advanceYear()">⏭ +1 an</button>
+  </header>
+  <nav id="sidebar"></nav>
+  <main id="main"></main>
+  <aside id="panel">
+    <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px">📋 Journal</div>
+    <div id="log-list"></div>
+  </aside>
+</div>
+<div id="modal-container"></div>
+<script>
+// ══════════════════════════════════════════════════════════
+//  VITAFORGE 2.0 — DATA & CONSTANTS
+// ══════════════════════════════════════════════════════════
+
+const CITIES = [
+  {id:'caen',name:'Caen',flag:'⚔️',cost:1.5,salary:0.97,biz:1.02,desc:'Normandie, ville historique'},
+  {id:'paris',name:'Paris',flag:'🗼',cost:3,salary:1.20,biz:1.25,desc:'IDF, salaires +20%'},
+  {id:'lyon',name:'Lyon',flag:'🦁',cost:2,salary:1.08,biz:1.10,desc:'2e ville, dynamique'},
+  {id:'marseille',name:'Marseille',flag:'⚓',cost:1.8,salary:1.0,biz:1.05,desc:'Soleil, port, opportunités'},
+  {id:'bordeaux',name:'Bordeaux',flag:'🍷',cost:2,salary:1.05,biz:1.08,desc:'Croissance rapide'},
+  {id:'nice',name:'Nice',flag:'🌊',cost:2.2,salary:1.05,biz:1.10,desc:'Côte d\'Azur'},
+  {id:'toulouse',name:'Toulouse',flag:'✈️',cost:1.9,salary:1.05,biz:1.12,desc:'Aéro, tech'},
+  {id:'nantes',name:'Nantes',flag:'🏰',cost:1.7,salary:1.0,biz:1.05,desc:'Attractif, accessible'},
+  {id:'strasbourg',name:'Strasbourg',flag:'🇪🇺',cost:1.8,salary:1.02,biz:1.08,desc:'Europe, institutions'},
+  {id:'monaco',name:'Monaco',flag:'🎰',cost:5,salary:1.35,biz:1.40,desc:'0% impôt, prestige max'},
+];
+
+const SECTORS = [
+  {id:'resto',name:'Restaurant / Traiteur',icon:'🍽️',startMin:25000,startMax:80000,revPer:68000,chargesR:0.58,tvaR:0.10,riskIdx:3,desc:'Restauration, dark kitchen, traiteur événementiel',risks:['Inspection sanitaire DGAL','Mauvaise critique presse','Fournisseur en rupture','Grève personnel'],opps:['Guide Michelin recommandé','Contrat événementiel','Franchise nationale','Livraison partenaire']},
+  {id:'tech',name:'Startup Tech / SaaS',icon:'💻',startMin:40000,startMax:120000,revPer:135000,chargesR:0.42,tvaR:0.20,riskIdx:2,desc:'Logiciels, IA, plateformes numériques',risks:['Cyberattaque majeure','Départ équipe fondatrice','Concurrent VC-backed','Bug critique production'],opps:['Levée Série A','Rachat big tech','Prix startup de l\'année','Contrat CAC40']},
+  {id:'retail',name:'Commerce / E-commerce',icon:'🛒',startMin:15000,startMax:60000,revPer:55000,chargesR:0.60,tvaR:0.20,riskIdx:3,desc:'Boutique physique, marketplace, marque propre',risks:['Amazon concurrence','Vol & démarque inconnue','Rupture fournisseur Asie','Baisse fréquentation'],opps:['Viral TikTok','Contrat grande surface','Export EU','Rachat par groupe']},
+  {id:'btp',name:'BTP / Construction',icon:'🏗️',startMin:60000,startMax:200000,revPer:82000,chargesR:0.54,tvaR:0.20,riskIdx:4,desc:'Gros oeuvre, rénovation, promotion immobilière',risks:['Accident chantier grave','Intempéries prolongées','Défaut paiement client','Hausse matières +40%'],opps:['Appel offres public','Certification RGE','Marché promoteur privé','Chantier international']},
+  {id:'conseil',name:'Cabinet Conseil / Audit',icon:'📊',startMin:12000,startMax:40000,revPer:165000,chargesR:0.33,tvaR:0.20,riskIdx:1,desc:'Strategy, M&A, IT consulting, audit financier',risks:['Perte grand compte','Conflit intérêts','Débauchage par client','Mauvais audit'],opps:['Mission Fortune 500','Bureau international','Rachat par Big 4','Label Excellence']},
+  {id:'immo',name:'Immobilier / Promotion',icon:'🏠',startMin:80000,startMax:300000,revPer:220000,chargesR:0.28,tvaR:0.20,riskIdx:2,desc:'Agence, promotion, gestion locative, SCPI',risks:['Marché baisse 15%','Litige locataire','Perte carte pro','Frilosité banques'],opps:['Programme 50 logements','Gestion 100 biens','SCPI lancée','Partenariat promoteur']},
+  {id:'pharma',name:'Pharmaceutique / Biotech',icon:'💊',startMin:200000,startMax:2000000,revPer:280000,chargesR:0.55,tvaR:0.20,riskIdx:3,desc:'Médicaments génériques, biotech, dispositifs médicaux',risks:['Essai clinique raté','Retrait marché','Amende ANSM','Brevet expiré'],opps:['Molécule brevetée','Rachat pharma US','Contrat Sécurité Sociale','Prix Nobel']},
+  {id:'cosm',name:'Cosmétique / Beauté',icon:'💄',startMin:20000,startMax:150000,revPer:95000,chargesR:0.50,tvaR:0.20,riskIdx:2,desc:'Marques propres, soins, parfumerie, spa',risks:['Controverse ingrédient','Copycat chinois','Célébrité bad buzz','Règlement EU cosmétiques'],opps:['Influenceur viral','Contrat Sephora','Export Asie','Rachat LVMH']},
+  {id:'auto',name:'Industrie Automobile',icon:'🚗',startMin:500000,startMax:5000000,revPer:180000,chargesR:0.65,tvaR:0.20,riskIdx:4,desc:'Équipementier, concessionnaire, pièces, électrique',risks:['Récession auto','Rappel qualité','Coupure chaîne appro','Délocalisation'],opps:['Contrat OEM','Électrification','Export Chine','Fusion équipementier']},
+  {id:'club',name:'Boîte de Nuit / Bar',icon:'🎉',startMin:80000,startMax:500000,revPer:120000,chargesR:0.62,tvaR:0.20,riskIdx:4,desc:'Nightclub, bar cocktail, bar à chicha, lounge',risks:['Fermeture préfectorale','Rixe violence','Contrôle stupéfiants','Voisinage plainte'],opps:['Top DJ résidence','Franchise concept','Nuit sold-out récurrente','Télé-réalité tournage']},
+  {id:'robot',name:'Robotique / IA Hardware',icon:'🤖',startMin:300000,startMax:3000000,revPer:250000,chargesR:0.50,tvaR:0.20,riskIdx:3,desc:'Robots industriels, drones, IA embarquée',risks:['Brevet concurrent','Composant rare pénurie','Accident robot','Règlement IA EU'],opps:['Contrat industrie','Armée/défense','CES Las Vegas prix','Rachat Siemens/ABB']},
+  {id:'it',name:'IT Hardware / Composants',icon:'🖥️',startMin:150000,startMax:1500000,revPer:160000,chargesR:0.58,tvaR:0.20,riskIdx:3,desc:'Serveurs, semi-conducteurs, périphériques pro',risks:['Pénurie puces','Concurrent Asie','Obsolescence rapide','Export control US'],opps:['Contrat data center','Partenariat Intel/AMD','Armée commande','Cryptomining boom']},
+];
+
+const DIPLOMES = ['Aucun','Brevet','Bac','BTS/IUT','Licence','Master','MBA','Doctorat','Grande École'];
+const SPEC = {
+  'BTS/IUT':['Informatique','Commerce','Comptabilité','Électronique','Mécanique','Communication'],
+  'Licence':['Droit','Économie','Sciences','Lettres','Gestion','Informatique','Chimie'],
+  'Master':['Finance','Management','Ingénierie','Marketing','Droit des affaires','Data Science','Médecine'],
+  'MBA':['Entrepreneuriat','Finance d\'entreprise','Strategy internationale','Digital'],
+  'Doctorat':['Sciences','Pharmacologie','Économie','Informatique'],
+  'Grande École':['HEC','Polytechnique','Sciences Po','ESSEC','CentraleSupélec'],
+};
+
+const JOBS_BY_SECTOR = {
+  general:[
+    // Jobs dès 15 ans (temps partiel / jobs étudiants)
+    {name:'Babysitter / Aide-ménager',icon:'🧹',salBase:4500,req:'Aucun',minAge:15,promoCeil:6000,partTime:true,desc:'Temps partiel · ~8h/sem'},
+    {name:'Livreur vélo',icon:'🚲',salBase:5200,req:'Aucun',minAge:15,promoCeil:7000,partTime:true,desc:'Temps partiel · soirs & WE'},
+    {name:'Job en supermarché (caisse/rayon)',icon:'🛒',salBase:6000,req:'Aucun',minAge:16,promoCeil:8000,partTime:true,desc:'Temps partiel · 20h/sem'},
+    {name:'Serveur/Serveuse',icon:'🍽️',salBase:7000,req:'Aucun',minAge:16,promoCeil:9000,partTime:true,desc:'Temps partiel · soirs & WE'},
+    // Jobs plein temps sans études
+    {name:'Caissier / Hôte de caisse',icon:'🛒',salBase:20800,req:'Aucun',minAge:18,promoCeil:26000},
+    {name:'Livreur / Manutentionnaire',icon:'📦',salBase:21500,req:'Aucun',minAge:18,promoCeil:28000},
+    {name:'Ouvrier bâtiment',icon:'🏗️',salBase:22000,req:'Aucun',minAge:18,promoCeil:32000},
+    {name:'Agent de sécurité',icon:'🔐',salBase:22500,req:'Aucun',minAge:18,promoCeil:30000},
+    {name:'Aide-soignant',icon:'🏥',salBase:23000,req:'Aucun',minAge:18,promoCeil:32000},
+    {name:'Conducteur de poids-lourd',icon:'🚛',salBase:28000,req:'Bac',minAge:21,promoCeil:38000},
+    {name:'Employé administratif',icon:'📄',salBase:25000,req:'Bac',minAge:18,promoCeil:36000},
+    {name:'Technicien de maintenance',icon:'🔧',salBase:30000,req:'BTS/IUT',minAge:20,promoCeil:44000},
+    {name:'Comptable',icon:'🔢',salBase:34000,req:'BTS/IUT',minAge:20,promoCeil:52000},
+    {name:'Responsable d\'équipe',icon:'📋',salBase:38000,req:'Licence',minAge:22,promoCeil:55000},
+    {name:'Chef de projet',icon:'📐',salBase:45000,req:'Master',minAge:24,promoCeil:70000},
+    {name:'Ingénieur',icon:'⚙️',salBase:46000,req:'Master',minAge:24,promoCeil:85000},
+    {name:'Avocat',icon:'⚖️',salBase:52000,req:'Master',minAge:26,promoCeil:200000},
+    {name:'Médecin généraliste',icon:'🩺',salBase:65000,req:'Doctorat',minAge:30,promoCeil:120000},
+    {name:'Directeur Commercial',icon:'💼',salBase:65000,req:'Master',minAge:28,promoCeil:130000},
+    {name:'DAF / CFO',icon:'📊',salBase:90000,req:'Grande École',minAge:30,promoCeil:200000},
+    {name:'PDG / CEO',icon:'🏆',salBase:120000,req:'Grande École',minAge:32,promoCeil:1000000},
+  ],
+  racing:[
+    {name:'Pilote karting amateur',icon:'🏎️',salBase:0,req:'Aucun',minAge:14,promoCeil:0,isRacing:true},
+    {name:'Pilote rallye régional',icon:'🚗',salBase:15000,req:'Aucun',minAge:18,promoCeil:40000,isRacing:true},
+    {name:'Pilote rallye national',icon:'🚗',salBase:40000,req:'Aucun',minAge:20,promoCeil:100000,isRacing:true},
+    {name:'Pilote F3',icon:'🏎️',salBase:80000,req:'Aucun',minAge:18,promoCeil:200000,isRacing:true},
+    {name:'Pilote F2',icon:'🏎️',salBase:200000,req:'Aucun',minAge:20,promoCeil:500000,isRacing:true},
+    {name:'Pilote F1 rookie',icon:'🏎️',salBase:800000,req:'Aucun',minAge:22,promoCeil:2000000,isRacing:true},
+    {name:'Pilote F1 titulaire',icon:'🏆',salBase:3000000,req:'Aucun',minAge:23,promoCeil:60000000,isRacing:true},
+  ],
+};
+
+// Generative vehicle market
+function genVehicles(seed=0){
+  const models = [
+    {make:'Peugeot',model:'208',type:'Citadine',baseP:8500,icon:'🚗',fuel:'Essence',depR:0.13,run:1100},
+    {make:'Renault',model:'Clio V',type:'Citadine',baseP:9000,icon:'🚗',fuel:'Essence',depR:0.13,run:1050},
+    {make:'Volkswagen',model:'Golf 8',type:'Compacte',baseP:14000,icon:'🚗',fuel:'Hybride',depR:0.11,run:980},
+    {make:'Dacia',model:'Sandero',type:'Citadine',baseP:7000,icon:'🚗',fuel:'GPL',depR:0.15,run:800},
+    {make:'Toyota',model:'Yaris',type:'Citadine',baseP:9500,icon:'🚗',fuel:'Hybride',depR:0.10,run:900},
+    {make:'BMW',model:'Série 3 320d',type:'Berline',baseP:22000,icon:'🚗',fuel:'Diesel',depR:0.12,run:1800},
+    {make:'Mercedes',model:'Classe C 220d',type:'Berline',baseP:25000,icon:'🚗',fuel:'Diesel',depR:0.11,run:1900},
+    {make:'Audi',model:'A4 2.0 TDI',type:'Berline',baseP:24000,icon:'🚗',fuel:'Diesel',depR:0.12,run:1850},
+    {make:'Tesla',model:'Model 3 SR',type:'Berline',baseP:32000,icon:'🚗',fuel:'Électrique',depR:0.09,run:600},
+    {make:'Tesla',model:'Model S Plaid',type:'Berline Sport',baseP:110000,icon:'🚗',fuel:'Électrique',depR:0.09,run:1200},
+    {make:'Porsche',model:'911 Carrera S',type:'Sport',baseP:95000,icon:'🏎️',fuel:'Essence',depR:0.07,run:4500},
+    {make:'Porsche',model:'Cayenne Turbo',type:'SUV Sport',baseP:85000,icon:'🚙',fuel:'Essence',depR:0.10,run:4000},
+    {make:'Ferrari',model:'Roma',type:'GT',baseP:225000,icon:'🏎️',fuel:'Essence',depR:0.06,run:8000},
+    {make:'Lamborghini',model:'Huracán EVO',type:'Supercar',baseP:220000,icon:'🏎️',fuel:'Essence',depR:0.06,run:9000},
+    {make:'Rolls-Royce',model:'Ghost',type:'Prestige',baseP:330000,icon:'🚗',fuel:'Essence',depR:0.07,run:12000},
+    {make:'Bugatti',model:'Chiron',type:'Hypercar',baseP:2800000,icon:'🏎️',fuel:'Essence',depR:0.05,run:30000},
+    {make:'Yamaha',model:'MT-07',type:'Moto',baseP:7200,icon:'🏍️',fuel:'Essence',depR:0.11,run:600},
+    {make:'Honda',model:'CB750 Hornet',type:'Moto',baseP:8500,icon:'🏍️',fuel:'Essence',depR:0.11,run:620},
+    {make:'Harley-Davidson',model:'Sportster S',type:'Moto',baseP:14500,icon:'🏍️',fuel:'Essence',depR:0.09,run:1200},
+    {make:'Ducati',model:'Panigale V4',type:'Moto Sport',baseP:28000,icon:'🏍️',fuel:'Essence',depR:0.10,run:1800},
+    {make:'Jeanneau',model:'Sun Odyssey 349',type:'Voilier',baseP:89000,icon:'⛵',fuel:'Voile',depR:0.06,run:4000},
+    {make:'Bayliner',model:'VR6',type:'Bateau moteur',baseP:32000,icon:'🚤',fuel:'Essence',depR:0.08,run:2500},
+    {make:'Sunseeker',model:'Predator 65',type:'Yacht 20m',baseP:1500000,icon:'🛥️',fuel:'Diesel',depR:0.06,run:80000},
+    {make:'Benetti',model:'Crystal 140',type:'Superyacht 43m',baseP:18000000,icon:'🛥️',fuel:'Diesel',depR:0.04,run:500000},
+    {make:'Cessna',model:'172 Skyhawk',type:'Avion tourisme',baseP:140000,icon:'✈️',fuel:'Avgas',depR:0.04,run:18000},
+    {make:'Cirrus',model:'SR22T',type:'Avion tourisme',baseP:750000,icon:'✈️',fuel:'Avgas',depR:0.04,run:35000},
+    {make:'Dassault',model:'Falcon 2000',type:'Jet privé',baseP:12000000,icon:'✈️',fuel:'Kérosène',depR:0.05,run:800000},
+    {make:'Gulfstream',model:'G700',type:'Jet privé long',baseP:75000000,icon:'✈️',fuel:'Kérosène',depR:0.04,run:2500000},
+  ];
+  const cities = ['Paris 75','Lyon 69','Marseille 13','Bordeaux 33','Nice 06','Toulouse 31','Nantes 44','Strasbourg 67','Lille 59','Rennes 35','Montpellier 34','Metz 57'];
+  const colors = ['Noir','Blanc','Gris','Bleu','Rouge','Vert','Argent','Orange','Beige','Bordeaux'];
+  const baseYear = 2024;
+  let vehicles = [];
+  let r = seed;
+  const rng = ()=>{ r=(r*1664525+1013904223)&0xffffffff; return (r>>>0)/4294967296; };
+  models.forEach((m,i)=>{
+    let count = m.type.includes('Hyper')||m.type.includes('Yacht')||m.type.includes('Jet')?1:m.baseP>100000?2:3;
+    for(let j=0;j<count;j++){
+      let age = Math.floor(rng()*8)+1;
+      let km = m.type==='Voilier'||m.type.includes('Bateau')||m.type.includes('Avion')||m.type.includes('Yacht')||m.type.includes('Jet')?0:Math.floor(rng()*120000+2000);
+      let price = Math.round(m.baseP * Math.pow(1-m.depR,age) * (0.92+rng()*0.16));
+      vehicles.push({
+        id:'v'+(i*10+j),cat:m.type.includes('Moto')?'Moto':m.type.includes('Voilier')||m.type.includes('Bateau')||m.type.includes('Yacht')?'Bateau':m.type.includes('Avion')||m.type.includes('Jet')?'Avion':'Voiture',
+        make:m.make, model:m.model, type:m.type,
+        name:m.make+' '+m.model,
+        year:baseYear-age, km, price,
+        fuel:m.fuel, color:colors[Math.floor(rng()*colors.length)],
+        loc:cities[Math.floor(rng()*cities.length)],
+        depreciation:m.depR, running:m.run, icon:m.icon,
+        basePrice:m.baseP,
+      });
+    }
+  });
+  return vehicles;
+}
+
+const FLOOR_PLANS = {
+  studio:`┌──────────────┐\n│  🛏 Chambre   │\n│  + salon      │\n├──────────────┤\n│ 🚿 SdB │ 🍳  │\n└──────────────┘`,
+  t2:`┌───────┬───────┐\n│🛏 Ch1 │ 🍳    │\n│       │Cuisine│\n├───────┤       │\n│ 🛁SdB │ Salon │\n└───────┴───────┘`,
+  t3:`┌──────┬──────┐\n│🛏 Ch1│🛏 Ch2│\n├──────┴──┬───┤\n│  Salon  │🛁 │\n├──────┬──┘   │\n│Cuisi.│Hall  │\n└──────┴──────┘`,
+  t4:`┌──────┬──────┐\n│🛏 Ch1│🛏 Ch2│\n├──────┼──────┤\n│🛏 Ch3│ 🛁   │\n├──────┴──────┤\n│  Salon / Cuisine│\n└─────────────┘`,
+  villa:`┌─────────────────┐\n│🛏  │🛏  │🛏   │\n│Ch1 │Ch2 │Ch3  │\n├────┴────┴─────┤\n│🛁        │ 🛁 │\n├──────────┤    │\n│  Salon   ├────┤\n│          │🍳  │\n├──────────┤    │\n│  Piscine 🏊  │\n└─────────────────┘`,
+  manoir:`┌──────────────────────┐\n│🛏 │🛏 │🛏 │🛏 │🛁  │\n│Ch1│Ch2│Ch3│Ch4│SdB │\n├───┴───┴───┴───┴────┤\n│ Grande salle / Salon│\n├──────────────┬──────┤\n│Salle à manger│Cuisine│\n├──────┬───────┴──────┤\n│Bibli.│  Hall entrée │\n└──────┴──────────────┘`,
+};
+
+const REAL_ESTATE = [
+  {id:'re1',type:'location',cat:'Studio',name:'Studio meublé 22m²',city:'Paris 11e',price:850,charges:80,rooms:1,bath:1,plan:'studio',icon:'🏠',desc:'Idéal départ, métro 2 min'},
+  {id:'re2',type:'location',cat:'Appartement',name:'T2 42m²',city:'Lyon 3e',price:720,charges:65,rooms:2,bath:1,plan:'t2',icon:'🏠',desc:'Balcon, lumineux'},
+  {id:'re3',type:'location',cat:'Appartement',name:'T3 65m²',city:'Bordeaux',price:950,charges:90,rooms:3,bath:1,plan:'t3',icon:'🏢',desc:'Chartrons, parquet'},
+  {id:'re4',type:'location',cat:'Appartement',name:'T4 88m²',city:'Nantes',price:1100,charges:110,rooms:4,bath:2,plan:'t4',icon:'🏢',desc:'Résidentiel, calme'},
+  {id:'re5',type:'location',cat:'Maison',name:'Maison 130m² + jardin',city:'Rennes',price:1400,charges:140,rooms:5,bath:2,plan:'villa',icon:'🏡',desc:'Garage, jardin 400m²'},
+  {id:'re6',type:'location',cat:'Maison',name:'Villa Moderne 200m²',city:'Nice',price:3800,charges:300,rooms:5,bath:3,plan:'villa',icon:'🏡',desc:'Vue mer, piscine chauffée'},
+  {id:'re7',type:'achat',cat:'Studio',name:'Studio 28m²',city:'Paris 20e',price:195000,surface:28,fraisN:15600,rendL:4.2,rooms:1,bath:1,plan:'studio',icon:'🏠'},
+  {id:'re8',type:'achat',cat:'Appartement',name:'T2 45m²',city:'Lyon 6e',price:260000,surface:45,fraisN:20800,rendL:4.5,rooms:2,bath:1,plan:'t2',icon:'🏠'},
+  {id:'re9',type:'achat',cat:'Appartement',name:'T3 68m²',city:'Montpellier',price:210000,surface:68,fraisN:16800,rendL:5.1,rooms:3,bath:1,plan:'t3',icon:'🏢'},
+  {id:'re10',type:'achat',cat:'Maison',name:'Maison 115m²',city:'Nantes périphérie',price:295000,surface:115,fraisN:23600,rendL:4.8,rooms:4,bath:2,plan:'t4',icon:'🏡'},
+  {id:'re11',type:'achat',cat:'Appartement',name:'T4 92m² vue mer',city:'Nice',price:450000,surface:92,fraisN:36000,rendL:3.8,rooms:4,bath:2,plan:'t4',icon:'🌊'},
+  {id:'re12',type:'achat',cat:'Villa',name:'Villa 250m² piscine',city:'Cannes',price:1400000,surface:250,fraisN:112000,rendL:3.0,rooms:6,bath:3,plan:'villa',icon:'🏡'},
+  {id:'re13',type:'achat',cat:'Chalet',name:'Chalet 190m²',city:'Megève',price:920000,surface:190,fraisN:73600,rendL:5.2,rooms:5,bath:3,plan:'villa',icon:'🏔️'},
+  {id:'re14',type:'achat',cat:'Manoir',name:'Manoir 600m² + parc',city:'Dordogne',price:1800000,surface:600,fraisN:144000,rendL:2.5,rooms:9,bath:5,plan:'manoir',icon:'🏰'},
+  {id:'re15',type:'achat',cat:'Penthouse',name:'Penthouse 320m² terrasse',city:'Paris 8e',price:6500000,surface:320,fraisN:520000,rendL:2.2,rooms:6,bath:4,plan:'villa',icon:'✨'},
+  {id:'re16',type:'achat',cat:'Château',name:'Château 1200m² + vignoble',city:'Saint-Émilion',price:12000000,surface:1200,fraisN:960000,rendL:1.8,rooms:15,bath:8,plan:'manoir',icon:'🏰'},
+];
+
+const EVENTS_POOL = {
+  child:[
+    {txt:'Un camarade te propose de tricher à un contrôle important.',icon:'📝',choices:[
+      {t:'Accepter',e:{intelligence:5,karma:-12}},{t:'Refuser fermement',e:{karma:12,bonheur:-3}},{t:'L\'ignorer',e:{}},
+    ]},
+    {txt:'Tu trouves 50€ dans la rue.',icon:'💸',choices:[
+      {t:'Garder',e:{argent:50,karma:-5}},{t:'Rendre à la mairie',e:{karma:15,bonheur:5}},{t:'Partager avec amis',e:{argent:25,karma:8,bonheur:8}},
+    ]},
+    {txt:'Tu es victime de harcèlement scolaire.',icon:'😢',choices:[
+      {t:'En parler aux parents',e:{bonheur:8,karma:5,sante:5}},{t:'Changer d\'école',e:{bonheur:5,argent:-500}},{t:'Garder pour toi',e:{bonheur:-15,sante:-8}},
+    ]},
+    {txt:'Opportunité de joindre une chorale ou équipe de sport.',icon:'⚽',choices:[
+      {t:'Sport (+charisme)',e:{charisme:8,sante:5,bonheur:5}},{t:'Chorale (+intelligence)',e:{intelligence:5,charisme:5}},{t:'Refuser',e:{}},
+    ]},
+  ],
+  teen:[
+    {txt:'Tu peux partir en échange scolaire à l\'étranger 6 mois.',icon:'🌍',choices:[
+      {t:'Partir en Angleterre',e:{intelligence:15,charisme:10,argent:-1500}},{t:'Partir en Allemagne',e:{intelligence:12,charisme:8,argent:-1200}},{t:'Rester',e:{}},
+    ]},
+    {txt:'Premier job étudiant possible (SMIC, 15h/semaine).',icon:'💼',choices:[
+      {t:'Accepter',e:{argent:6000,bonheur:-3}},{t:'Refuser (focus études)',e:{intelligence:5}},{t:'Négocier + heures',e:{argent:9000,sante:-5,intelligence:-3}},
+    ]},
+    {txt:'Soirée étudiante. Drogues et alcool circulent.',icon:'🎉',choices:[
+      {t:'Partir',e:{karma:10,sante:5}},{t:'Rester sobre',e:{charisme:3}},{t:'Participer',e:{bonheur:10,sante:-18,karma:-15}},
+    ]},
+    {txt:'Un professeur te conseille de postuler dans une école très sélective.',icon:'🎓',choices:[
+      {t:'Tenter (travail intense)',e:{intelligence:18,sante:-8,bonheur:-5}},{t:'Tenter modérément',e:{intelligence:10}},{t:'Suivre chemin classique',e:{}},
+    ]},
+  ],
+  adult:[
+    {txt:'Ton patron te propose une promotion avec relocalisation à l\'étranger.',icon:'✈️',choices:[
+      {t:'Accepter (Dubai)',fn:'promoEtranger',e:{bonheur:5}},{t:'Négocier télétravail',e:{argent:8000,bonheur:3}},{t:'Refuser',e:{karma:3}},
+    ]},
+    {txt:'Tu apprends qu\'un concurrent utilise des pratiques illégales.',icon:'⚖️',choices:[
+      {t:'Dénoncer DGCCRF',e:{karma:20,bonheur:5}},{t:'Ignorer',e:{karma:-5}},{t:'En profiter aussi',e:{argent:15000,karma:-25}},
+    ]},
+    {txt:'Opportunité d\'investissement immobilier avec levier 5x.',icon:'🏠',choices:[
+      {t:'Investir (risqué)',fn:'investImmoLevier'},{t:'Investir sans levier',fn:'investImmoSafe'},{t:'Passer son tour',e:{}},
+    ]},
+    {txt:'Tu es témoin d\'un grave accident de la route.',icon:'🚑',choices:[
+      {t:'Porter secours',e:{karma:20,bonheur:8}},{t:'Appeler le 15',e:{karma:8}},{t:'Continuer ta route',e:{karma:-25,bonheur:-12}},
+    ]},
+    {txt:'Un ami te propose de blanchir de l\'argent via ton entreprise.',icon:'💰',choices:[
+      {t:'Refuser catégoriquement',e:{karma:15}},{t:'Accepter (risque prison)',fn:'blanchiment'},{t:'Dénoncer à la police',e:{karma:25,bonheur:3}},
+    ]},
+    {txt:'Un chasseur de têtes te contacte pour un poste concurrent + 40%.',icon:'📱',choices:[
+      {t:'Accepter',fn:'jobOffer'},{t:'Négocier hausse chez toi',fn:'negoHausse'},{t:'Refuser loyauté',e:{karma:10,bonheur:-5}},
+    ]},
+  ],
+  senior:[
+    {txt:'Tes enfants demandent ton aide pour acheter leur logement.',icon:'🏠',choices:[
+      {t:'Donation 100 000 €',e:{argent:-100000,bonheur:20,karma:15}},{t:'Prêt 50 000 €',e:{argent:-50000,bonheur:10,karma:8}},{t:'Refuser',e:{bonheur:-20,karma:-15}},
+    ]},
+    {txt:'Un problème cardiaque nécessite une opération urgente.',icon:'❤️',choices:[
+      {t:'Opération privée (20k€)',e:{argent:-20000,sante:30}},{t:'Opération publique (attente)',e:{sante:15,bonheur:-8}},{t:'Traitement médicaments',e:{argent:-3000,sante:8}},
+    ]},
+  ],
+};
+
+// ══════════════════════════════════════════════════════════
+//  VITAFORGE 2.0 — GAME ENGINE
+// ══════════════════════════════════════════════════════════
+
+let G = null;
+let currentTab = 'vie';
+let _mktSeed = Date.now();
+let _vehicles = [];
+let _actionCooldowns = {}; // type -> times used this year
+
+function rng(a=0,b=100){ return Math.floor(Math.random()*(b-a+1))+a; }
+function clamp(v,lo=0,hi=100){ return Math.max(lo,Math.min(hi,v)); }
+function fmt(n){ return Math.round(n||0).toLocaleString('fr-FR')+' €'; }
+function fmtN(n){ return Math.round(n||0).toLocaleString('fr-FR'); }
+function pct(x,t){ return Math.round((x/t)*100); }
+function calcIR(net){
+  if(net<=11294)return 0;
+  if(net<=28797)return(net-11294)*0.11;
+  if(net<=82341)return(28797-11294)*0.11+(net-28797)*0.30;
+  return(28797-11294)*0.11+(82341-28797)*0.30+(net-82341)*0.41;
+}
+
+// ── INIT ──────────────────────────────────────────────────
+function startGame(){
+  const cityId = window._selectedCity||'caen';
+  const city = CITIES.find(c=>c.id===cityId)||CITIES[0];
+  const prenoms=['Alex','Jordan','Morgan','Taylor','Casey','Riley','Sam','Charlie','Lou','Robin','Léo','Emma','Lucas','Chloé','Hugo','Inès','Théo'];
+  const noms=['Martin','Bernard','Dubois','Thomas','Robert','Petit','Leroy','Simon','Moreau','Laurent','Renard','Faure','Mercier','Blanc'];
+  _vehicles = genVehicles(_mktSeed);
+  G={
+    prenom:prenoms[rng(0,prenoms.length-1)], nom:noms[rng(0,noms.length-1)],
+    age:0, city, birthYear:2000,
+    sante:rng(78,95), bonheur:rng(65,85), intelligence:rng(38,62), karma:rng(45,62), charisme:rng(35,60),
+    argent:0, dettes:0, totalImpots:0, totalRevenu:0,
+    salaireBrut:0, job:null, jobYears:0, jobLevel:0, racingCareer:null,
+    diplome:'Aucun', specialisation:null,
+    diplomeEnCours:null, // {name, yearsLeft, cost}
+    logement:null, immo:[], vehicules:[], vehiculeFonction:null,
+    livretA:0, livretACap:22950, pea:0, peaCap:150000, crypto:0,
+    // Famille
+    conjoint:null, enfants:[], // {prenom,age,playing:false}
+    amis:0,
+    // Éducation
+    niveauReussite:60, alternance:false,
+    // Entreprises (liste)
+    entreprises:[], // voir createBizObj
+    holding:null, sci:null,
+    // Montages fiscaux
+    fiscalMontages:[],
+    // Fraude
+    fraudeActive:false, fraudeNiveau:0, fraudeRisque:0,
+    // Course auto
+    ecurie:null,
+    // Stats vie
+    log:[], pendingEvent:null, gameOver:false,
+    yearActions:{}, // type->count this year
+    pendingJob:null, // entretien en cours
+  };
+  document.getElementById('start-screen').style.display='none';
+  addLog(0,'Naissance de '+G.prenom+' '+G.nom+' à '+city.name+' !','info');
+  setTab('vie');
+  renderAll();
+}
+
+function addLog(age,txt,type=''){
+  G.log.unshift({age,txt,type});
+  if(G.log.length>60)G.log.pop();
+  renderLog();
+}
+
+function canDoAction(type, maxPerYear=2){
+  if(!G.yearActions[type]) G.yearActions[type]=0;
+  return G.yearActions[type] < maxPerYear;
+}
+function useAction(type){
+  if(!G.yearActions[type]) G.yearActions[type]=0;
+  G.yearActions[type]++;
+}
+
+// ── ADVANCE YEAR ──────────────────────────────────────────
+function advanceYear(){
+  if(!G||G.gameOver)return;
+  G.age++;
+  G.yearActions={};
+
+  // ── Salaires ──
+  if(G.salaireBrut>0 && !G.entreprises.length){
+    const cotis=G.salaireBrut*0.22;
+    const net=G.salaireBrut-cotis;
+    const ir=calcIR(net);
+    const netnet=net-ir;
+    G.argent+=netnet;
+    G.totalRevenu+=G.salaireBrut;
+    G.totalImpots+=cotis+ir;
+    addLog(G.age,`💼 Salaire: ${fmt(netnet)} net-net (IR ${fmt(ir)})`, 'good');
+    G.jobYears++;
+    // Promotion automatique
+    if(G.job && G.jobYears>0 && G.jobYears%3===0){
+      const boost=rng(2,6);
+      G.salaireBrut=Math.round(G.salaireBrut*(1+boost/100));
+      G.jobLevel=Math.min(5,G.jobLevel+1);
+      addLog(G.age,`📈 Progression: +${boost}% → ${fmt(G.salaireBrut)}/an brut`,'good');
+    }
+  }
+
+  // ── Loyer ──
+  if(G.logement?.type==='location'){
+    const an=G.logement.loyer*12;
+    G.argent-=an;
+    G.argent=Math.max(0,G.argent);
+  }
+
+  // ── Crédits immo ──
+  G.immo.forEach(b=>{
+    if(b.credit&&b.credit.remaining>0){
+      const annee=b.credit.mensualite*12;
+      G.argent-=annee;
+      b.credit.remaining-=annee*0.35;
+      if(b.credit.remaining<0)b.credit.remaining=0;
+      G.dettes=Math.max(0,G.dettes-annee*0.35);
+    }
+    // Loyers entrants
+    if(b.loue){
+      const brut=b.loyerM*12;
+      const revFon=brut*0.70;
+      const ir=revFon*0.30;
+      const net=revFon-ir;
+      G.argent+=net;
+      G.totalRevenu+=brut;
+      G.totalImpots+=ir;
+      addLog(G.age,`🏠 Loyers ${b.name}: +${fmt(Math.round(net))} nets`,'good');
+    }
+    // Valorisation marché
+    b.valeur*=(1+(Math.random()*0.07-0.01));
+  });
+
+  // ── Vehicules: entretien annuel ──
+  G.vehicules.forEach(v=>{ G.argent-=v.running; });
+
+  // ── Placements ──
+  if(G.livretA>0){ const i=G.livretA*0.03; G.livretA+=i; if(i>50)addLog(G.age,`💚 Livret A: +${fmt(i)} intérêts`); }
+  if(G.pea>0){ const p=(Math.random()-0.33)*0.25; G.pea*=(1+p); if(Math.abs(p)>0.06)addLog(G.age,`📊 PEA: ${p>0?'+':''}${(p*100).toFixed(1)}% → ${fmt(G.pea)}`,p>0?'good':'bad'); }
+  if(G.crypto>0){ const p=(Math.random()-0.42)*0.75; G.crypto*=(1+p); G.crypto=Math.max(0,G.crypto); if(Math.abs(p)>0.12)addLog(G.age,`₿ Crypto: ${p>0?'+':''}${(p*100).toFixed(0)}% → ${fmt(G.crypto)}`,p>0?'good':'bad'); }
+
+  // ── Entreprises ──
+  G.entreprises.forEach(e=>tickBusiness(e));
+
+  // ── Holding ──
+  if(G.holding){ tickHolding(); }
+
+  // ── Fraude ──
+  if(G.fraudeActive){ tickFraude(); }
+
+  // ── Carrière racing ──
+  if(G.racingCareer){ tickRacing(); }
+
+  // ── Stats drift ──
+  G.sante=clamp(G.sante+rng(-4,2)+(G.age>50?-1:0)+(G.bonheur>70?1:0));
+  G.bonheur=clamp(G.bonheur+rng(-3,3)+(G.argent>100000?1:0)+(G.logement?2:0)+(G.conjoint?3:0));
+  G.charisme=clamp(G.charisme+rng(-1,2));
+
+  // ── Enfants vieillissent ──
+  G.enfants.forEach(e=>{ e.age++; });
+
+  // ── Milestones ──
+  checkMilestones();
+
+  // ── Diplome en cours ──
+  if(G.diplomeEnCours){
+    // Frais annuels
+    if(G.diplomeEnCours.cout>0){
+      if(G.argent<G.diplomeEnCours.cout){ addLog(G.age,'⚠️ Impossible de payer les frais de scolarité !','bad'); }
+      else { G.argent-=G.diplomeEnCours.cout; }
+    }
+    // Alternance
+    if(G.alternance){ const alt=900*12; G.argent+=alt; addLog(G.age,`🔄 Alternance: +${fmt(alt)}`,'good'); }
+    G.diplomeEnCours.yearsLeft--;
+    if(G.diplomeEnCours.yearsLeft<=0){
+      // Succès conditionnel au niveau de réussite
+      const niveauReussite=G.niveauReussite||60;
+      if(niveauReussite>=40){
+        G.diplome=G.diplomeEnCours.name;
+        if(G.diplomeEnCours.spec) G.specialisation=G.diplomeEnCours.spec;
+        const mention=niveauReussite>=90?'Mention Très Bien 🏆':niveauReussite>=75?'Mention Bien ✅':niveauReussite>=60?'Mention Assez Bien':'Passable';
+        addLog(G.age,'🎓 '+G.diplomeEnCours.name+' obtenu ! '+mention+(G.specialisation?' en '+G.specialisation:''),'good');
+        // Bonus selon mention
+        if(niveauReussite>=90){G.intelligence=clamp(G.intelligence+8,0,100);G.charisme=clamp(G.charisme+5,0,100);}
+        else if(niveauReussite>=75){G.intelligence=clamp(G.intelligence+4,0,100);}
+      } else {
+        addLog(G.age,'❌ Diplôme raté ! Niveau de réussite trop bas ('+niveauReussite+'/100). Recommence.','bad');
+        G.niveauReussite=40; // reset partiel
+      }
+      G.diplomeEnCours=null;
+      G.alternance=false;
+    }
+  }
+
+  // ── Event ──
+  const phase=getPhase();
+  const pool=EVENTS_POOL[phase]||[];
+  if(pool.length&&Math.random()<0.40){
+    const ev=pool[rng(0,pool.length-1)];
+    showEventModal(ev);
+    return;
+  }
+  if(G.sante<=0||G.age>=95){ gameOver(); return; }
+  renderAll();
+}
+
+function checkMilestones(){
+  if(G.age===6) addLog(G.age,'📚 Rentrée au CP !','info');
+  if(G.age===11) addLog(G.age,'📚 Entrée au collège.','info');
+  if(G.age===14&&G.intelligence>=48&&!G.diplomeEnCours&&DIPLOMES.indexOf(G.diplome)<1){ G.diplome='Brevet'; addLog(G.age,'✅ Brevet des collèges','good'); }
+  if(G.age===17&&G.intelligence>=52&&!G.diplomeEnCours&&DIPLOMES.indexOf(G.diplome)<2){ G.diplome='Bac'; addLog(G.age,'🎓 Bac obtenu !','good'); }
+  if(G.age===65) addLog(G.age,'👴 Retraite. Profite !','info');
+}
+
+function getPhase(){
+  if(G.age<13)return'child';
+  if(G.age<18)return'teen';
+  if(G.age<65)return'adult';
+  return'senior';
+}
+
+// ── BUSINESS ENGINE ───────────────────────────────────────
+function createBizObj(secId, nom, capital){
+  const sec=SECTORS.find(s=>s.id===secId);
+  return {
+    id:'biz'+Date.now(),
+    secteur:sec, nom, capital,
+    employes:1, niveau:1,
+    stock:sec.stockItems?sec.stockItems.map(it=>({item:it,qte:it.consumePerMonth*6})):[],
+    produits:[], // {nom,prixVente,coutUnit,qty,marketing,icon}
+    fournisseurs:[], // {nom,remise,fiabilite}
+    ca:0, chargesTotal:0, tva:0, is:0, resultatNet:0,
+    tresorerie:capital*0.5,
+    dette:0, // dette bancaire entreprise
+    immoEntreprise:[], // biens détenus par la société
+    vehiculesFonction:[], // voitures de société
+    exercices:[],
+    annee:1, valorisation:0,
+    isFiliale:false, holdingId:null,
+    aVendre:false, offreRachat:null,
+  };
+}
+
+function tickBusiness(e){
+  const sec=e.secteur;
+  const city=G.city;
+  // CA basé produits + employés
+  let caBase=sec.revPer*e.employes*(0.75+e.niveau*0.05)*city.biz*(0.85+Math.random()*0.30);
+  let caProduits=0;
+  e.produits.forEach(p=>{
+    // Attractivité = qualité fournisseur + rapport prix/prix_base
+    const qualite=(p.fournisseur?.qualite||70)/100;
+    const prixRatio=p.prixBase?Math.max(0.3,1-(p.prixVente/p.prixBase-1)*0.5):1;
+    const attractivite=qualite*0.5+prixRatio*0.5;
+    caProduits+=p.prixVente*p.qty*attractivite*(0.7+Math.random()*0.6);
+  });
+  let ca=caBase+caProduits;
+
+  // Charges détaillées
+  const massSal=e.employes*36000*1.42;
+  const loyer=e.niveau>=3?36000:e.niveau>=2?20000:8000;
+  const marketing=e.produits.reduce((a,p)=>a+p.marketing,0);
+  const autresCharges=ca*(sec.chargesR-0.35)+loyer+marketing;
+  const chargesTotal=massSal+autresCharges;
+
+  // Dette entreprise intérêts
+  const interetsDette=e.dette>0?e.dette*0.045:0;
+
+  // TVA
+  const tvaC=ca*sec.tvaR;
+  const tvaD=chargesTotal*0.08;
+  const tva=Math.max(0,tvaC-tvaD);
+
+  // EBIT & IS
+  const ebit=ca-chargesTotal-interetsDette;
+  let is=0;
+  if(ebit>0){
+    is=ebit<=42500?ebit*0.15:42500*0.15+(ebit-42500)*0.25;
+    // Montages fiscaux: holding réduit IS
+    if(G.holding&&e.holdingId===G.holding.id) is*=0.75;
+    // Fraude
+    if(G.fraudeActive&&G.fraudeNiveau>=1) is*=(1-G.fraudeNiveau*0.08);
+  }
+  const net=ebit-is;
+
+  // Stocks consommés
+  e.stock.forEach(s=>{
+    const conso=(s.item.consumePerMonth||10)*12*(0.7+Math.random()*0.6);
+    s.qte=Math.max(0,s.qte-Math.round(conso));
+    if(s.qte<(s.item.consumePerMonth||5)*2) addLog(G.age,`⚠️ Stock bas: ${s.item.nom} (${e.nom})`,'warn');
+  });
+
+  e.ca+=ca; e.chargesTotal+=chargesTotal; e.tva+=tva; e.is+=is; e.resultatNet+=net;
+  e.tresorerie+=net-tva-interetsDette;
+  if(e.dette>0){ const rembDette=Math.min(e.dette,net*0.2); e.dette-=rembDette; e.tresorerie-=rembDette; }
+
+  G.totalImpots+=is+tva;
+
+  // Valorisation EV/EBITDA simplifié
+  const ebitda=ebit+chargesTotal*0.05;
+  e.valorisation=Math.max(0,ebitda>0?ebitda*rng(4,12):0);
+
+  e.exercices.push({an:e.annee,ca:Math.round(ca),massSal:Math.round(massSal),loyer,marketing:Math.round(marketing),charges:Math.round(chargesTotal),ebit:Math.round(ebit),is:Math.round(is),tva:Math.round(tva),net:Math.round(net)});
+  if(e.exercices.length>10)e.exercices.shift();
+  e.annee++;
+
+  if(net>0) addLog(G.age,`${sec.icon} ${e.nom}: CA ${fmt(ca)} / Net ${fmt(net)}`,'good');
+  else addLog(G.age,`${sec.icon} ${e.nom}: DÉFICIT ${fmt(-net)}`,'bad');
+
+  // Event biz
+  if(Math.random()<0.22){
+    if(Math.random()<0.5){
+      const ev=sec.risks[rng(0,sec.risks.length-1)];
+      const imp=rng(2000,30000);
+      e.tresorerie-=imp;
+      addLog(G.age,`🚨 ${e.nom}: ${ev} (−${fmt(imp)})`,'bad');
+    } else {
+      const ev=sec.opps[rng(0,sec.opps.length-1)];
+      const imp=rng(5000,50000);
+      e.tresorerie+=imp*0.3;
+      addLog(G.age,`✨ ${e.nom}: ${ev} (+CA)`,'good');
+    }
+  }
+
+  // Offre de rachat aléatoire
+  if(!e.aVendre&&e.valorisation>50000&&Math.random()<0.06){
+    e.offreRachat={montant:Math.round(e.valorisation*(0.9+Math.random()*0.4)),acheteur:['Groupe Carrefour','Fonds Eurazeo','Investisseur PE','Concurrent stratégique','Fonds familial'][rng(0,4)]};
+    addLog(G.age,`💼 Offre de rachat reçue pour ${e.nom}: ${fmt(e.offreRachat.montant)} par ${e.offreRachat.acheteur}`,'event');
+    if(currentTab==='entreprises')renderMain();
+  }
+
+  if(e.tresorerie<-50000){ addLog(G.age,`🔴 ${e.nom}: Cessation de paiement imminente !`,'bad'); }
+}
+
+function tickHolding(){
+  const h=G.holding;
+  let divTotal=0;
+  G.entreprises.filter(e=>e.holdingId===h.id).forEach(e=>{
+    if(e.resultatNet>0){
+      const div=e.resultatNet*0.40*0.05;// dividendes remontés partiellement
+      divTotal+=div;
+    }
+  });
+  h.revenus=(h.revenus||0)+divTotal;
+  // IS holding réduit (régime mère-fille)
+  const isH=divTotal*0.0125;
+  h.revenus-=isH;
+  G.totalImpots+=isH;
+  if(divTotal>1000) addLog(G.age,`🏛️ Holding ${h.nom}: dividendes remontés ${fmt(divTotal)}`,'good');
+}
+
+function tickFraude(){
+  G.fraudeRisque+=rng(3,8);
+  if(G.fraudeRisque>100){
+    G.fraudeActive=false; G.fraudeNiveau=0; G.fraudeRisque=0;
+    const amende=Math.round(G.argent*rng(20,50)/100);
+    G.argent-=amende; G.argent=Math.max(0,G.argent);
+    G.bonheur=clamp(G.bonheur-20); G.karma=clamp(G.karma-30);
+    addLog(G.age,`🚨 FRAUDE FISCALE DÉCOUVERTE! Amende: ${fmt(amende)}. Casier judiciaire.`,'bad');
+    showNotif('Fraude découverte!',`Tu paies ${fmt(amende)} d'amende et tu as un casier judiciaire.`,'danger');
+  }
+}
+
+function tickRacing(){
+  const r=G.racingCareer;
+  // Seuls les revenus sponsors sont automatiques. Les courses se font manuellement.
+  r.sponsors.forEach(s=>{ G.argent+=s.montant; });
+  if(r.sponsors.length>0) addLog(G.age,`🏎️ Revenus sponsors: +${fmt(r.sponsors.reduce((a,s)=>a+s.montant,0))}`,'good');
+}
+
+// ── FAMILY ────────────────────────────────────────────────
+function proposerMariage(){
+  if(G.conjoint){ showNotif('Déjà marié(e)','Tu as déjà un(e) conjoint(e).','warn'); return; }
+  if(G.age<18){ showNotif('Trop jeune','Il faut avoir 18 ans.','warn'); return; }
+  const prenoms=['Marie','Pierre','Julie','Thomas','Camille','Nicolas','Sophie','Julien','Emma','Lucas','Léa','Antoine','Chloé','Hugo','Inès','Maxime','Clara','Romain'];
+  const noms=['Martin','Bernard','Dubois','Thomas','Robert','Petit','Leroy','Simon','Moreau','Laurent'];
+  const p=prenoms[rng(0,prenoms.length-1)];
+  const n=noms[rng(0,noms.length-1)];
+  const age=G.age+rng(-5,5);
+  const chance=Math.min(0.85,(G.charisme/100)*0.6+(G.argent>50000?0.2:0)+(G.logement?0.1:0));
+  if(Math.random()<chance){
+    G.conjoint={
+      prenom:p, nom:n,
+      age:Math.max(18,age),
+      travaille:Math.random()>0.3,
+      salaire:rng(22000,80000),
+      beaute:rng(35,90),
+      intelligence:rng(35,85),
+      charisme:rng(30,80),
+      bonheur:rng(60,85),
+      relation:70,
+    };
+    G.bonheur=clamp(G.bonheur+15);
+    addLog(G.age,`💍 Mariage avec ${p} ${n} ! (${Math.max(18,age)} ans)`,'good');
+  } else {
+    addLog(G.age,`💔 ${p} a refusé ta demande...`,'bad');
+  }
+  renderAll();
+}
+
+function avoirEnfant(){
+  if(G.age<18||G.age>55){ showNotif('Pas possible','Âge incompatible.','warn'); return; }
+  if(!G.conjoint){ showNotif('Pas de conjoint(e)','Il faut être en couple.','warn'); return; }
+  if(G.enfants.length>=5){ showNotif('Famille nombreuse','Maximum 5 enfants.','warn'); return; }
+  const p=['Léo','Emma','Lucas','Chloé','Hugo','Inès','Théo','Lola','Nathan','Jade'][rng(0,9)];
+  G.enfants.push({prenom:p,age:0,jouable:false,stats:{sante:90,bonheur:80,intelligence:rng(40,70),karma:55,charisme:rng(35,60)}});
+  G.bonheur=clamp(G.bonheur+12);
+  addLog(G.age,`👶 Naissance de ${p} !`,'good');
+  renderAll();
+}
+
+function jouerEnfant(idx){
+  const enfant=G.enfants[idx];
+  if(enfant.age<18){ showNotif('Trop jeune','Ton enfant doit avoir 18 ans pour jouer.','warn'); return; }
+  // On sauvegarde le perso actuel et on joue l'enfant
+  // Pour simplifier: on bascule G en mode "enfant"
+  showNotif('Mode descendance','Fonctionnalité: l\'enfant hérite du patrimoine. Lance une nouvelle vie en choisissant de jouer '+enfant.prenom+'.','info');
+}
+
+// ── HOLDING / SCI ─────────────────────────────────────────
+function creerHolding(){
+  if(G.holding){ showNotif('Déjà créé','Tu as déjà une holding.','warn'); return; }
+  if(G.entreprises.length<2){ showNotif('Prérequis','Il faut au moins 2 entreprises.','warn'); return; }
+  const cout=5000;
+  if(G.argent<cout){ showNotif('Fonds insuffisants',`Besoin: ${fmt(cout)}`,'warn'); return; }
+  G.argent-=cout;
+  G.holding={id:'h'+Date.now(),nom:G.nom+' Holding SAS',revenus:0,impots:0};
+  G.entreprises.forEach(e=>{ e.holdingId=G.holding.id; e.isFiliale=true; });
+  G.fiscalMontages.push('Holding (IS réduit, régime mère-fille)');
+  addLog(G.age,`🏛️ Holding ${G.holding.nom} créée — IS optimisé !`,'good');
+  renderAll();
+}
+
+function creerSCI(){
+  if(G.sci){ showNotif('Déjà créé','Tu as déjà une SCI.','warn'); return; }
+  if(G.immo.length<1){ showNotif('Prérequis','Il faut au moins 1 bien immobilier.','warn'); return; }
+  const cout=3000;
+  if(G.argent<cout){ showNotif('Fonds insuffisants',`Besoin: ${fmt(cout)}`,'warn'); return; }
+  G.argent-=cout;
+  G.sci={id:'sci'+Date.now(),nom:G.nom+' SCI',biens:[...G.immo.map(b=>b.id)]};
+  G.fiscalMontages.push('SCI (revenus fonciers à l\'IS)');
+  addLog(G.age,`🏛️ SCI ${G.sci.nom} créée — fiscalité foncière optimisée !`,'good');
+  renderAll();
+}
+
+// ── FRAUDE FISCALE ────────────────────────────────────────
+function activerFraude(niveau){
+  if(!G.entreprises.length){ showNotif('Prérequis','Il faut une entreprise pour frauder.','warn'); return; }
+  G.fraudeActive=true;
+  G.fraudeNiveau=niveau;
+  G.fraudeRisque=niveau*10;
+  const gains=['Petits arrangements (facturation gonflée)','Comptes offshore (paradis fiscal)','Blanchiment via filiales'][niveau-1];
+  addLog(G.age,`⚠️ Fraude fiscale activée: ${gains} (risque: ${G.fraudeRisque}%)`,'warn');
+  renderAll();
+}
+
+// ── RACING ────────────────────────────────────────────────
+function rejoindreRacing(niveau){
+  const levels=[
+    {name:'Karting amateur',primeV:500,primeP:200,cout:5000,talent:0.3,circuit:'Circuit local'},
+    {name:'Rallye régional',primeV:3000,primeP:1000,cout:25000,talent:0.35,circuit:'Rallye régional'},
+    {name:'Rallye national',primeV:15000,primeP:5000,cout:80000,talent:0.4,circuit:'Championnat France'},
+    {name:'Formule 3',primeV:40000,primeP:15000,cout:200000,talent:0.45,circuit:'F3'},
+    {name:'Formule 2',primeV:100000,primeP:40000,cout:500000,talent:0.50,circuit:'F2'},
+    {name:'F1 rookie',primeV:500000,primeP:200000,cout:0,talent:0.55,circuit:'F1 GP'},
+  ];
+  const lvl=levels[niveau];
+  if(lvl.cout>0&&G.argent<lvl.cout){ showNotif('Fonds insuffisants',`Besoin: ${fmt(lvl.cout)} pour cette saison`,'warn'); return; }
+  G.argent-=lvl.cout;
+  G.racingCareer={
+    niveau, name:lvl.name, primeVictoire:lvl.primeV, primePodium:lvl.primeP,
+    talent:lvl.talent, circuit:lvl.circuit, courses:0, victoires:0, gains:0,
+    sponsors:[], ecurie:null,
+  };
+  if(lvl.cout>0) addLog(G.age,`🏎️ Début en ${lvl.name}! Budget: ${fmt(lvl.cout)}`,'good');
+  else addLog(G.age,`🏎️ Contrat F1 signé !`,'good');
+  renderAll();
+}
+
+function racheterEcurie(){
+  if(!G.racingCareer){ showNotif('Prérequis','Il faut être pilote.','warn'); return; }
+  const prix=rng(50000000,500000000);
+  if(G.argent<prix*0.20){ showNotif('Fonds insuffisants',`Rachat d'écurie: ${fmt(prix)} (apport 20%)`,'warn'); return; }
+  G.argent-=prix*0.20;
+  G.dettes+=prix*0.80;
+  G.ecurie={nom:G.nom+' Racing',prix,budget:rng(50000000,200000000),pilotes:['Pilote A','Pilote B'],points:0};
+  addLog(G.age,`🏁 Écurie ${G.ecurie.nom} achetée pour ${fmt(prix)} !`,'good');
+  renderAll();
+}
+
+// ── ACHAT/VENTE ENTREPRISE ────────────────────────────────
+function racheterEntrepriseEnDifficulte(){
+  // Générer une opportunité
+  const secIdx=rng(0,SECTORS.length-1);
+  const sec=SECTORS[secIdx];
+  const valeur=rng(50000,2000000);
+  const prix=Math.round(valeur*rng(20,50)/100);
+  showModal({
+    title:'🔴 Rachat entreprise en difficulté',
+    desc:`Opportunité: ${sec.name} en liquidation.\nValeur estimée: ${fmt(valeur)}\nPrix de rachat: ${fmt(prix)}\n\nL'entreprise a des dettes (${fmt(rng(10000,100000))} €) mais un potentiel de redressement.`,
+    choices:[
+      {t:`✅ Racheter pour ${fmt(prix)}`,fn:'doRachat',data:{sec:sec.id,prix,valeur}},
+      {t:'❌ Passer',e:{}},
+    ]
+  });
+}
+
+function vendreBusiness(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e)return;
+  if(!e.offreRachat){
+    // Chercher acheteur
+    const chance=Math.min(0.80,(e.valorisation>100000?0.5:0.2)+(G.charisme/200));
+    if(Math.random()>chance){
+      addLog(G.age,`🔍 Recherche d'acheteur pour ${e.nom}: pas d'offre cette année.`,'warn');
+      renderMain(); return;
+    }
+    e.offreRachat={montant:Math.round(e.valorisation*(0.85+Math.random()*0.3)),acheteur:'Investisseur contacté'};
+  }
+  showModal({
+    title:`💼 Vente de ${e.nom}`,
+    desc:`Offre de ${e.offreRachat.acheteur}: ${fmt(e.offreRachat.montant)}\nValorisation estimée: ${fmt(e.valorisation)}\n\nLa plus-value sera taxée à 30% (flat tax).`,
+    choices:[
+      {t:'✅ Accepter cette offre',fn:'confirmerVente',data:{bizId}},
+      {t:'❌ Refuser / Négocier plus',fn:'negocierVente',data:{bizId}},
+    ]
+  });
+}
+
+// ── INTERVIEW EMPLOI ──────────────────────────────────────
+function passEntretien(jobIdx){
+  const job=JOBS_BY_SECTOR.general[jobIdx];
+  if(!job)return;
+  if(G.age<job.minAge){ showNotif('Trop jeune',`Ce poste requiert ${job.minAge} ans minimum.`,'warn'); return; }
+  const dipOk=DIPLOMES.indexOf(G.diplome)>=DIPLOMES.indexOf(job.req);
+  if(!dipOk){ showNotif('Diplôme insuffisant',`Requis: ${job.req}`,'warn'); return; }
+  // Chance de réussite
+  const chance=clamp((G.intelligence/100)*0.4+(G.charisme/100)*0.4+(G.jobLevel*0.05)+0.1,0.1,0.95);
+  showModal({
+    title:`💼 Entretien: ${job.name}`,
+    desc:`Salaire proposé: ${fmt(job.salBase)} €/an brut\nTon profil: Intelligence ${G.intelligence}/100, Charisme ${G.charisme}/100\nChance de succès estimée: ${Math.round(chance*100)}%`,
+    choices:[
+      {t:'🎯 Tenter l\'entretien',fn:'doEntretien',data:{jobIdx,chance}},
+      {t:'❌ Annuler',e:{}},
+    ]
+  });
+}
+
+// ── MODAL SYSTEM ─────────────────────────────────────────
+let _modalChoices=[];
+function showModal(opts){
+  const {title,desc,choices=[],noClose=false}=opts;
+  _modalChoices=choices;
+  const ch=choices.map((c,i)=>`
+    <button class="btn ${c.danger?'btn-r':c.green?'btn-g':''}" onclick="resolveModal(${i})">
+      ${c.t}${c.e?`<span style="font-size:10px;color:var(--muted);margin-left:8px;font-family:var(--mono)">${fmtEff(c.e)}</span>`:''}
+    </button>`).join('');
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-bg" ${noClose?'':'onclick="closeModal()"'}>
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-title">${title}</div>
+        <div class="modal-desc">${(desc||'').replace(/\n/g,'<br>')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px">${ch}</div>
+        ${!noClose?'<button class="btn" style="margin-top:8px;color:var(--muted);font-size:11px" onclick="closeModal()">Fermer</button>':''}
+      </div>
+    </div>`;
+}
+function closeModal(){ document.getElementById('modal-container').innerHTML=''; _modalChoices=[]; }
+function showNotif(title,msg,type='info'){
+  showModal({title:(type==='danger'?'🚨':type==='warn'?'⚠️':type==='good'?'✅':'ℹ️')+' '+title,desc:msg,choices:[{t:'OK',e:{}}]});
+}
+function fmtEff(e){
+  if(!e)return'';
+  return Object.entries(e).filter(([k,v])=>v).map(([k,v])=>`${k}:${v>0?'+':''}${typeof v==='number'&&Math.abs(v)>999?fmt(v):v}`).join(' ');
+}
+function resolveModal(idx){
+  const c=_modalChoices[idx];
+  if(!c)return;
+  closeModal();
+  if(c.e){
+    if(c.e.argent)G.argent+=c.e.argent;
+    if(c.e.sante)G.sante=clamp(G.sante+c.e.sante);
+    if(c.e.bonheur)G.bonheur=clamp(G.bonheur+c.e.bonheur);
+    if(c.e.intelligence)G.intelligence=clamp(G.intelligence+c.e.intelligence,0,100);
+    if(c.e.karma)G.karma=clamp(G.karma+c.e.karma);
+    if(c.e.charisme)G.charisme=clamp(G.charisme+c.e.charisme,0,100);
+  }
+  if(c.fn){
+    if(c.fn==='doEntretien'){
+      const {jobIdx,chance}=c.data;
+      const job=JOBS_BY_SECTOR.general[jobIdx];
+      if(Math.random()<chance){
+        G.job=job; G.salaireBrut=job.salBase; G.jobYears=0; G.jobLevel=0; G.entreprises=[];
+        addLog(G.age,`✅ Embauché ! ${job.name} — ${fmt(job.salBase)}/an`,'good');
+      } else {
+        addLog(G.age,`❌ Entretien raté pour: ${job.name}`,'bad');
+      }
+    } else if(c.fn==='doRachat'){
+      const {sec,prix,valeur}=c.data;
+      if(G.argent<prix){showNotif('Fonds insuffisants','','')}
+      else{
+        G.argent-=prix;
+        const biz=createBizObj(sec,SECTORS.find(s=>s.id===sec).name+' (Reprise)',prix);
+        biz.tresorerie=prix*0.3;
+        biz.dette=valeur*0.3;
+        G.entreprises.push(biz);
+        if(G.holding)biz.holdingId=G.holding.id;
+        addLog(G.age,`🔴 Reprise d'entreprise réussie ! ${biz.nom}`,'good');
+      }
+    } else if(c.fn==='confirmerVente'){
+      const biz=G.entreprises.find(x=>x.id===c.data.bizId);
+      if(biz){
+        const pv=biz.offreRachat.montant-biz.capital;
+        const tax=pv>0?pv*0.30:0;
+        G.argent+=biz.offreRachat.montant-tax;
+        G.totalImpots+=tax;
+        G.entreprises=G.entreprises.filter(x=>x.id!==c.data.bizId);
+        addLog(G.age,`💰 Vente de ${biz.nom}: +${fmt(biz.offreRachat.montant)} (PV taxée: ${fmt(tax)})`,'good');
+      }
+    } else if(c.fn==='negocierVente'){
+      const biz=G.entreprises.find(x=>x.id===c.data.bizId);
+      if(biz&&biz.offreRachat){
+        if(Math.random()>0.5){
+          biz.offreRachat.montant=Math.round(biz.offreRachat.montant*1.08);
+          addLog(G.age,`📈 Négociation réussie: offre montée à ${fmt(biz.offreRachat.montant)}`,'good');
+        } else {
+          biz.offreRachat=null;
+          addLog(G.age,`💔 Négociation échouée: l'acheteur s'est retiré`,'bad');
+        }
+      }
+    } else if(c.fn==='promoEtranger'){
+      G.argent+=25000; G.salaireBrut=Math.round(G.salaireBrut*1.35);
+      addLog(G.age,'✈️ Expatriation acceptée. Salaire +35% !','good');
+    } else if(c.fn==='investImmoLevier'){
+      const gain=Math.random()>0.45?rng(30000,150000):-rng(10000,50000);
+      G.argent+=gain;
+      addLog(G.age,gain>0?`🏠 Investissement immo levier: +${fmt(gain)}`:`🏠 Investissement immo levier: ${fmt(gain)}`,'good');
+    } else if(c.fn==='investImmoSafe'){
+      G.argent+=rng(5000,20000);
+      addLog(G.age,'🏠 Investissement immo classique: petit gain sûr','good');
+    } else if(c.fn==='blanchiment'){
+      G.fraudeActive=true; G.fraudeNiveau=3; G.fraudeRisque=40;
+      G.argent+=rng(50000,200000);
+      addLog(G.age,'💸 Blanchiment accepté: argent sale entré. Risque très élevé !','warn');
+    } else if(c.fn==='jobOffer'){
+      if(G.job){ G.salaireBrut=Math.round(G.salaireBrut*1.40); addLog(G.age,'💼 Changement de boite: +40% !','good'); }
+    } else if(c.fn==='negoHausse'){
+      if(Math.random()>0.4){ G.salaireBrut=Math.round(G.salaireBrut*1.15); addLog(G.age,'💼 Négociation hausse acceptée: +15%','good'); }
+      else addLog(G.age,'💼 Négociation rejetée...','bad');
+    }
+  }
+  if(G.sante<=0||G.age>=95)gameOver();
+  else renderAll();
+}
+function showEventModal(ev){
+  G.pendingEvent=ev;
+  const ch=ev.choices.map((c,i)=>`
+    <button class="btn" onclick="resolveModal(${i})">
+      ${c.t}${c.e?`<span style="font-size:10px;color:var(--muted);margin-left:8px;font-family:var(--mono)">${fmtEff(c.e)}</span>`:''}
+    </button>`).join('');
+  _modalChoices=ev.choices;
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-bg">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div style="font-size:9px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px">⚡ ÉVÉNEMENT — ${G.age} ANS</div>
+        <div class="modal-title">${ev.icon||'📌'} ${ev.txt}</div>
+        <div style="height:8px"></div>
+        <div style="display:flex;flex-direction:column;gap:5px">${ch}</div>
+      </div>
+    </div>`;
+}
+function gameOver(){
+  G.gameOver=true;
+  showModal({
+    title:(G.age>=90?'👴':'💀')+' Fin de vie de '+G.prenom,
+    desc:`${G.prenom} ${G.nom} s'est éteint(e) à ${G.age} ans.\n\nPatrimoine final: ${fmt(getPatrimoine())}\nImpôts payés: ${fmt(G.totalImpots)}\nKarma: ${G.karma}/100\nScore: ${calcScore()}/1000`,
+    choices:[{t:'🔄 Nouvelle vie',fn:'newGame'}],noClose:true,
+  });
+}
+function newGame(){ G=null; closeModal(); document.getElementById('start-screen').style.display='flex'; }
+function getPatrimoine(){
+  let p=G.argent+G.livretA+G.pea+G.crypto;
+  G.immo.forEach(b=>p+=b.valeur);
+  G.vehicules.forEach(v=>p+=Math.max(0,Math.round(v.price*Math.pow(1-v.depreciation,G.age-v.buyAge))));
+  G.entreprises.forEach(e=>p+=e.valorisation);
+  return Math.max(0,p-G.dettes);
+}
+function calcScore(){
+  let s=(G.sante+G.bonheur+G.karma+G.charisme+G.intelligence)/5;
+  s+=Math.min(300,getPatrimoine()/50000);
+  s+=G.age*1.5;
+  s+=DIPLOMES.indexOf(G.diplome)*20;
+  s+=G.enfants.length*15;
+  s+=G.conjoint?20:0;
+  return Math.round(clamp(s,0,1000));
+}
+
+// ══════════════════════════════════════════════════════════
+//  VITAFORGE 2.0 — RENDER / UI
+// ══════════════════════════════════════════════════════════
+
+const NAV=[
+  {sep:'Vie'},{tab:'vie',icon:'👤',label:'Ma vie'},
+  {tab:'famille',icon:'👨‍👩‍👧‍👦',label:'Famille'},
+  {tab:'sante',icon:'❤️',label:'Santé'},
+  {tab:'education',icon:'🎓',label:'Éducation'},
+  {sep:'Carrière'},
+  {tab:'emploi',icon:'💼',label:'Emploi'},
+  {tab:'racing',icon:'🏎️',label:'Motorsport'},
+  {sep:'Entreprises'},
+  {tab:'entreprises',icon:'🏢',label:'Mes Entreprises'},
+  {tab:'creerbiz',icon:'➕',label:'Créer / Reprendre'},
+  {tab:'compta',icon:'📊',label:'Comptabilité'},
+  {tab:'fiscal',icon:'⚖️',label:'Fiscal & Montages'},
+  {sep:'Patrimoine'},
+  {tab:'logement',icon:'🏠',label:'Logement'},
+  {tab:'vehicules',icon:'🚗',label:'Véhicules'},
+  {tab:'placements',icon:'📈',label:'Placements'},
+  {tab:'marketplace',icon:'🛒',label:'Marketplace'},
+  {sep:'Bilan'},
+  {tab:'bilan',icon:'💰',label:'Bilan perso'},
+];
+
+function setTab(t){ currentTab=t; document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t)); renderMain(); }
+
+function buildSidebar(){
+  document.getElementById('sidebar').innerHTML=NAV.map(n=>
+    n.sep?`<div class="nav-sep">${n.sep}</div>`:
+    `<button class="nav-btn ${currentTab===n.tab?'active':''}" data-tab="${n.tab}" onclick="setTab('${n.tab}')"><span class="nav-icon">${n.icon}</span>${n.label}</button>`
+  ).join('');
+}
+
+function renderAll(){
+  if(!G)return;
+  document.getElementById('age-badge').textContent=G.age+' ans';
+  document.getElementById('char-name').textContent=G.prenom+' '+G.nom+' · '+G.city.name;
+  document.getElementById('money-display').textContent=fmt(Math.round(G.argent));
+  const stats=[
+    {l:'❤️',v:G.sante,c:G.sante>60?'var(--green)':G.sante>30?'var(--amber)':'var(--red)'},
+    {l:'😊',v:G.bonheur,c:'#a59fff'},
+    {l:'🧠',v:G.intelligence,c:'var(--blue)'},
+    {l:'✨',v:G.karma,c:'var(--amber)'},
+    {l:'🎭',v:G.charisme,c:'var(--accent2)'},
+  ];
+  document.getElementById('header-stats').innerHTML=stats.map(s=>`<div class="hstat"><span class="hstat-v" style="color:${s.c}">${s.v}</span><span class="hstat-l">${s.l}</span></div>`).join('');
+  buildSidebar();
+  renderMain();
+  renderLog();
+}
+
+function renderLog(){
+  if(!G)return;
+  document.getElementById('log-list').innerHTML=G.log.slice(0,30).map(l=>`
+    <div class="log-item ${l.type}">
+      <span class="log-age">${l.age}</span>
+      <span class="log-text">${l.txt}</span>
+    </div>`).join('');
+}
+
+function renderMain(){
+  if(!G)return;
+  const m=document.getElementById('main');
+  const t=currentTab;
+  if(t==='vie')m.innerHTML=rVie();
+  else if(t==='famille')m.innerHTML=rFamille();
+  else if(t==='sante')m.innerHTML=rSante();
+  else if(t==='education')m.innerHTML=rEducation();
+  else if(t==='emploi')m.innerHTML=rEmploi();
+  else if(t==='racing')m.innerHTML=rRacing();
+  else if(t==='entreprises')m.innerHTML=rEntreprises();
+  else if(t==='creerbiz')m.innerHTML=rCreerBiz();
+  else if(t==='compta')m.innerHTML=rCompta();
+  else if(t==='fiscal')m.innerHTML=rFiscal();
+  else if(t==='logement')m.innerHTML=rLogement();
+  else if(t==='vehicules')m.innerHTML=rVehicules();
+  else if(t==='placements')m.innerHTML=rPlacements();
+  else if(t==='marketplace')m.innerHTML=rMarketplace();
+  else if(t==='bilan')m.innerHTML=rBilan();
+}
+
+// ─── VIE ──────────────────────────────────────────────────
+function rVie(){
+  const phase={child:'👶 Enfance',teen:'🧑 Ado',adult:'🧑 Adulte',senior:'👴 Retraite'}[getPhase()];
+  const ageMin={sport:8,medecin:0,vacances:12,ami:10,meditation:16,benevolat:14,psycho:18};
+  function canDo(type){ return G.age>=ageMin[type]&&canDoAction(type,2); }
+  return `
+  <h2>${G.prenom} ${G.nom}</h2>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:14px">${phase} · ${G.age} ans · <span class="badge badge-acc">${G.diplome}</span>${G.specialisation?` <span class="badge badge-b">${G.specialisation}</span>`:''} ${G.job?`· <span class="badge badge-g">${G.job.name}</span>`:''} · 📍${G.city.name}</p>
+  <div class="card">
+    <div class="card-title">Caractéristiques</div>
+    ${[['Santé',G.sante,G.sante>60?'var(--green)':G.sante>30?'var(--amber)':'var(--red)'],['Bonheur',G.bonheur,'#a59fff'],['Intelligence',G.intelligence,'var(--blue)'],['Karma',G.karma,'var(--amber)'],['Charisme',G.charisme,'var(--accent2)']].map(([n,v,c])=>`
+    <div class="stat-row"><span class="stat-name">${n}</span><div class="stat-bar"><div class="stat-fill" style="width:${v}%;background:${c}"></div></div><span class="stat-val" style="color:${c}">${v}</span></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">Actions (max 2×/an)</div>
+    ${canDo('sport')?`<button class="btn btn-g" onclick="doVieAction('sport')">🏃 Sport (200 €) · +8 santé</button>`:G.age<8?`<button class="btn" disabled>🏃 Sport (dès 8 ans)</button>`:`<button class="btn" disabled>🏃 Sport (limite annuelle atteinte)</button>`}
+    <button class="btn btn-g" onclick="doVieAction('medecin')">🩺 Médecin (300 €) · +12 santé</button>
+    ${G.age>=12?`<button class="btn" onclick="doVieAction('vacances')">🌴 Vacances (800 €) · +15 bonheur</button>`:''}
+    ${G.age>=10?`<button class="btn" onclick="doVieAction('ami')">👥 Amis (100 €) · +10 bonheur</button>`:''}
+    ${G.age>=16?`<button class="btn btn-acc" onclick="doVieAction('meditation')">🧘 Méditer (gratuit) · +5 bonheur</button>`:''}
+    ${G.age>=14?`<button class="btn btn-p" onclick="doVieAction('benevolat')">🤝 Bénévolat (gratuit) · +15 karma</button>`:''}
+    ${G.age>=18?`<button class="btn btn-b" onclick="doVieAction('psycho')">🧠 Suivi psy (1 200 €) · +12 bonheur</button>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title">Finances</div>
+    <div class="grid3">
+      <div class="metric"><div class="metric-v" style="color:var(--green)">${fmt(G.argent)}</div><div class="metric-l">Épargne</div></div>
+      <div class="metric"><div class="metric-v" style="color:${G.dettes>0?'var(--red)':'var(--muted)'}">${fmt(G.dettes)}</div><div class="metric-l">Dettes</div></div>
+      <div class="metric"><div class="metric-v">${fmt(getPatrimoine())}</div><div class="metric-l">Patrimoine</div></div>
+    </div>
+  </div>`;
+}
+
+function doVieAction(type){
+  const costs={sport:200,medecin:300,vacances:800,ami:100,meditation:0,benevolat:0,psycho:1200};
+  const ageMin={sport:8,medecin:0,vacances:12,ami:10,meditation:16,benevolat:14,psycho:18};
+  if(G.age<(ageMin[type]||0)){showNotif('Trop jeune','','' );return;}
+  if(!canDoAction(type,2)){showNotif('Limite atteinte','Max 2 fois par an.','warn');return;}
+  const c=costs[type];
+  if(G.argent<c){showNotif('Fonds insuffisants',`Besoin: ${fmt(c)}`,'warn');return;}
+  G.argent-=c;
+  useAction(type);
+  const fx={sport:{sante:8},medecin:{sante:12},vacances:{bonheur:15},ami:{bonheur:10,charisme:1},meditation:{bonheur:5,karma:3},benevolat:{karma:15,bonheur:5},psycho:{bonheur:12}};
+  const f=fx[type];
+  if(f.sante)G.sante=clamp(G.sante+f.sante);
+  if(f.bonheur)G.bonheur=clamp(G.bonheur+f.bonheur);
+  if(f.karma)G.karma=clamp(G.karma+f.karma);
+  if(f.charisme)G.charisme=clamp(G.charisme+f.charisme,0,100);
+  addLog(G.age,`${type}: ${JSON.stringify(f)}`,'good');
+  renderAll();
+}
+
+// ─── FAMILLE ──────────────────────────────────────────────
+function rFamille(){
+  return `
+  <h2>👨‍👩‍👧 Famille</h2>
+  <div class="card">
+    <div class="card-title">Vie de couple</div>
+    ${G.conjoint?`
+    <div style="background:var(--bg4);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <span style="font-size:32px">💑</span>
+        <div>
+          <div style="font-size:14px;font-weight:700">${G.conjoint.prenom} ${G.conjoint.nom||''}</div>
+          <div style="font-size:11px;color:var(--muted)">${G.conjoint.age} ans · ${G.conjoint.travaille?`Travaille (${fmt(G.conjoint.salaire)}/an)`:'Sans emploi'}</div>
+        </div>
+      </div>
+      ${[['💄 Beauté',G.conjoint.beaute||rng(40,80),'var(--accent2)'],['🧠 Intel.',G.conjoint.intelligence||rng(40,70),'var(--blue)'],['💬 Relation',G.conjoint.relation||70,'var(--green)'],['😊 Bonheur',G.conjoint.bonheur||rng(55,80),'#a59fff']].map(([n,v,c])=>`
+      <div class="stat-row"><span class="stat-name" style="width:78px">${n}</span><div class="stat-bar"><div class="stat-fill" style="width:${v}%;background:${c}"></div></div><span class="stat-val" style="color:${c}">${v}</span></div>`).join('')}
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">
+        <button class="inline-btn btn-acc" onclick="activiteCouple('resto')">🍽️ Resto (150€) +10 relation</button>
+        <button class="inline-btn btn-b" onclick="activiteCouple('voyage')">✈️ Voyage (800€) +20 relation</button>
+        <button class="inline-btn btn-g" onclick="activiteCouple('sport')">🎾 Sport (50€) +8 relation</button>
+      </div>
+    </div>
+    <button class="btn btn-r" onclick="divorcer()">💔 Divorcer (partage patrimoine 50%)</button>`:
+    `<p style="font-size:12px;color:var(--muted);margin-bottom:10px">${G.age<18?'Tu es trop jeune pour te marier.':'Pas encore de conjoint(e).'}</p>
+    ${G.age>=18?`<button class="btn btn-acc" onclick="proposerMariage()">💍 Chercher l'amour / Se marier</button>`:''}`}
+  </div>
+  <div class="card">
+    <div class="card-title">Enfants (${G.enfants.length}/5)</div>
+    ${G.enfants.length>0?G.enfants.map((e,i)=>`
+    <div class="asset-card" style="flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="asset-info"><div class="asset-name">${e.age<3?'👶':e.age<12?'🧒':e.age<18?'🧑':'👤'} ${e.prenom}</div><div class="asset-detail">${e.age} ans · ${e.age<6?'Bébé':e.age<11?'Enfant':e.age<18?'Adolescent':'Adulte'}</div></div>
+        ${e.age>=18?`<button class="inline-btn btn-acc" onclick="jouerEnfant(${i})">Jouer →</button>`:`<span class="badge badge-a">${e.age<6?'Bébé':e.age<12?'Enfant':'Ado'}</span>`}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        ${[['❤️ Santé',e.stats?.sante||80,'var(--green)'],['😊 Bonheur',e.stats?.bonheur||70,'#a59fff'],['🧠 Intel.',e.stats?.intelligence||50,'var(--blue)'],['🎭 Charisme',e.stats?.charisme||40,'var(--accent2)']].map(([n,v,c])=>`
+        <div class="stat-row" style="margin-bottom:2px"><span class="stat-name" style="width:68px;font-size:9px">${n}</span><div class="stat-bar"><div class="stat-fill" style="width:${v}%;background:${c}"></div></div><span class="stat-val" style="color:${c};font-size:10px">${v}</span></div>`).join('')}
+      </div>
+      ${e.age>=6&&e.age<18?`<button class="inline-btn btn-b" onclick="investirEnfant(${i})">📚 Aide scolaire (500€) +8 intel</button>`:''}
+    </div>`).join(''):'<p style="font-size:12px;color:var(--muted)">Pas d\'enfants.</p>'}
+    ${G.age>=18&&G.conjoint&&G.enfants.length<5?`<button class="btn btn-g" onclick="avoirEnfant()">👶 Agrandir la famille</button>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title">Amis & Relations sociales</div>
+    <div class="grid2">
+      <div class="metric"><div class="metric-v">${G.amis||0}</div><div class="metric-l">Amis proches</div></div>
+      <div class="metric"><div class="metric-v" style="color:${G.bonheur>70?'var(--green)':'var(--muted)'}">${G.bonheur}</div><div class="metric-l">Bonheur social</div></div>
+    </div>
+    ${G.age>=10?`<button class="btn btn-b" onclick="seCreerDesAmis()">👥 Sortir & Rencontrer (100€ · +1 ami)</button>`:''}
+    ${(G.amis||0)>0?`<button class="btn" onclick="activiteAmis()">🎮 Activité avec amis (50€ · +8 bonheur)</button>`:''}
+  </div>`;
+}
+
+function activiteCouple(type){
+  const costs={resto:150,voyage:800,sport:50};
+  const gains={resto:10,voyage:20,sport:8};
+  const c=costs[type];
+  if(G.argent<c){showNotif('Fonds insuffisants',`Besoin: ${fmt(c)}`,'warn');return;}
+  G.argent-=c;
+  if(!G.conjoint.relation) G.conjoint.relation=70;
+  G.conjoint.relation=Math.min(100,G.conjoint.relation+gains[type]);
+  G.bonheur=clamp(G.bonheur+Math.round(gains[type]/2));
+  addLog(G.age,`💑 ${type} avec ${G.conjoint.prenom}: +${gains[type]} relation`,'good');
+  renderAll();
+}
+
+function seCreerDesAmis(){
+  if(G.argent<100){showNotif('Fonds insuffisants','100€ requis','warn');return;}
+  G.argent-=100;
+  if(!G.amis)G.amis=0;
+  G.amis++;
+  G.charisme=clamp(G.charisme+2,0,100);
+  addLog(G.age,`👥 Nouvel ami ! (${G.amis} amis)`,'good');
+  renderAll();
+}
+
+function activiteAmis(){
+  if(G.argent<50){showNotif('Fonds insuffisants','50€ requis','warn');return;}
+  G.argent-=50;
+  G.bonheur=clamp(G.bonheur+8);
+  addLog(G.age,'🎮 Sortie avec les amis : +8 bonheur','good');
+  renderAll();
+}
+
+function investirEnfant(idx){
+  const e=G.enfants[idx];
+  if(G.argent<500){showNotif('Fonds insuffisants','500€ requis','warn');return;}
+  G.argent-=500;
+  if(!e.stats) e.stats={sante:80,bonheur:70,intelligence:50,karma:55,charisme:40};
+  e.stats.intelligence=Math.min(100,e.stats.intelligence+8);
+  addLog(G.age,`📚 Aide scolaire pour ${e.prenom}: +8 intelligence`,'good');
+  renderAll();
+}
+
+function divorcer(){
+  if(!G.conjoint)return;
+  G.argent=Math.round(G.argent*0.50);
+  G.immo=G.immo.filter((_,i)=>i%2===0);
+  addLog(G.age,`💔 Divorce: patrimoine divisé par 2`,'bad');
+  G.conjoint=null;
+  G.bonheur=clamp(G.bonheur-20);
+  renderAll();
+}
+
+// ─── SANTÉ ────────────────────────────────────────────────
+function rSante(){
+  return `
+  <h2>❤️ Santé</h2>
+  <div class="card">
+    <div style="font-size:36px;font-weight:700;font-family:var(--mono);color:${G.sante>60?'var(--green)':G.sante>30?'var(--amber)':'var(--red)'}">
+      ${G.sante}<span style="font-size:16px">/100</span>
+    </div>
+    <div style="height:6px;background:var(--bg5);border-radius:3px;margin-top:8px;overflow:hidden">
+      <div style="height:100%;border-radius:3px;width:${G.sante}%;background:${G.sante>60?'var(--green)':G.sante>30?'var(--amber)':'var(--red)'}"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Soins médicaux</div>
+    <button class="btn btn-g" onclick="soinAction('bilan',300,15)">🩺 Bilan complet (300 €) +15</button>
+    <button class="btn btn-g" onclick="soinAction('dentiste',450,8)">🦷 Dentiste (450 €) +8</button>
+    ${G.age>=16?`<button class="btn btn-b" onclick="soinAction('psy',1200,10)">🧠 Psychologue (1 200 €) +10 bonheur</button>`:''}
+    ${G.age>=18?`<button class="btn btn-a" onclick="soinAction('thermal',2200,14)">🌊 Cure thermale (2 200 €) +14</button>`:''}
+    ${G.age>=18?`<button class="btn btn-r" onclick="soinAction('urgences',8000,22)">🚑 Hospitalisation urgences (8 000 €) +22</button>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title">Mode de vie (max 2×/an)</div>
+    <button class="btn" onclick="soinAction('bio',700,6)">🥗 Alimentation bio (700 €) +6</button>
+    <button class="btn" onclick="soinAction('gym',480,5)">💪 Salle de sport (480 €) +5</button>
+    ${G.age>=15?`<button class="btn" onclick="soinAction('yoga',360,4)">🧘 Yoga/pilates (360 €) +4</button>`:''}
+  </div>`;
+}
+
+function soinAction(type,cost,bonus){
+  if(G.argent<cost){showNotif('Fonds insuffisants','','');return;}
+  G.argent-=cost;
+  if(['psy'].includes(type)) G.bonheur=clamp(G.bonheur+bonus);
+  else G.sante=clamp(G.sante+bonus);
+  addLog(G.age,`${type}: +${bonus}${'psy'===type?' bonheur':' santé'}  (${fmt(cost)})`,'good');
+  renderAll();
+}
+
+// ─── ÉDUCATION ────────────────────────────────────────────
+function rEducation(){
+  const di=DIPLOMES.indexOf(G.diplome);
+  const nextDips=DIPLOMES.slice(di+1);
+  const durees={'BTS/IUT':3,'Licence':3,'Master':2,'MBA':1,'Doctorat':3,'Grande École':3};
+  // En France: écoles publiques gratuites, privées payantes
+  const couts={'BTS/IUT':0,'Licence':0,'Master':0,'MBA':12000,'Doctorat':0,'Grande École':10000};
+  const coutsPrives={'BTS/IUT':3500,'Licence':5000,'Master':8000,'MBA':25000,'Doctorat':0,'Grande École':0};
+  const reqAge={'BTS/IUT':18,'Licence':18,'Master':21,'MBA':24,'Doctorat':24,'Grande École':19};
+  const reqIntel={'BTS/IUT':48,'Licence':52,'Master':60,'MBA':65,'Doctorat':68,'Grande École':80};
+  // Prérequis de diplôme
+  const reqDiplome={'Licence':'BTS/IUT','Master':'Licence','Doctorat':'Master','MBA':'Master','Grande École':'Bac'};
+
+  const niveauReussite = G.niveauReussite || 60; // 0-100
+
+  return `
+  <h2>🎓 Éducation</h2>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Diplôme: <span class="badge badge-acc">${G.diplome}</span>${G.specialisation?` · Spé: <span class="badge badge-b">${G.specialisation}</span>`:''}</p>
+  ${G.diplomeEnCours?`<div class="notice-g">📚 En cours: ${G.diplomeEnCours.name} — ${G.diplomeEnCours.yearsLeft} an(s) restant(s) · Niveau de réussite: <strong>${niveauReussite}/100</strong></div>`:''}
+  <div class="card">
+    <div class="card-title">Niveau scolaire & Résultats</div>
+    <div class="stat-row"><span class="stat-name">Réussite</span><div class="stat-bar"><div class="stat-fill" style="width:${niveauReussite}%;background:${niveauReussite>70?'var(--green)':niveauReussite>40?'var(--amber)':'var(--red)'}"></div></div><span class="stat-val" style="color:${niveauReussite>70?'var(--green)':niveauReussite>40?'var(--amber)':'var(--red)'}">${niveauReussite}</span></div>
+    <div class="grid2" style="margin-top:8px">
+      <button class="btn btn-b" onclick="travaillerPlus()" ${!canDoAction('travailPlus',3)?'disabled':''}>📖 Travailler plus (+8 réussite, +5 intel · max 3×/an)</button>
+      <button class="btn btn-acc" onclick="seReposer()">😴 Se reposer (+10 bonheur)</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parcours académique</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">
+      ${DIPLOMES.map((d,i)=>`<span class="badge ${i<=di?'badge-g':'badge-acc'}" style="opacity:${i<=di?1:0.4}">${i<=di?'✓ ':''} ${d}</span>`).join('')}
+    </div>
+    ${!G.diplomeEnCours?nextDips.filter(d=>d!=='Brevet'&&d!=='Bac').map(d=>{
+      const prereq=reqDiplome[d];
+      const hasPrereq=!prereq||DIPLOMES.indexOf(G.diplome)>=DIPLOMES.indexOf(prereq);
+      const ok=G.age>=(reqAge[d]||18)&&G.intelligence>=(reqIntel[d]||50)&&hasPrereq;
+      const cout=couts[d]||0;
+      const coutPrive=coutsPrives[d]||0;
+      return `<div style="background:var(--bg4);border-radius:8px;padding:10px;margin-bottom:7px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">📜 ${d} (${durees[d]||2} ans)</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:6px">${prereq?`Prérequis: ${prereq} · `:''}${reqAge[d]} ans min · ${reqIntel[d]} intel min</div>
+        <div class="grid2">
+          ${cout===0?`<button class="btn btn-g" onclick="commencerDiplome('${d}',false)" ${!ok?'disabled':''}>🏛️ École publique (Gratuit)${!hasPrereq?` — Requis: ${prereq}`:''}</button>`:''}
+          ${coutPrive>0?`<button class="btn btn-b" onclick="commencerDiplome('${d}',true)" ${!ok?'disabled':''}>🏫 École privée (${fmt(coutPrive)}/an)</button>`:''}
+          ${cout>0&&coutPrive===0?`<button class="btn btn-b" onclick="commencerDiplome('${d}',false)" ${!ok?'disabled':''}>📚 Formation (${fmt(cout)}/an)${!hasPrereq?` — Requis: ${prereq}`:''}</button>`:''}
+        </div>
+      </div>`;
+    }).join(''):''}
+  </div>
+  <div class="card">
+    <div class="card-title">Spécialisation (après diplôme)</div>
+    ${G.diplome in SPEC?`
+    <p style="font-size:11px;color:var(--muted);margin-bottom:8px">Choisir une spécialisation booste ton employabilité et salaire :</p>
+    ${SPEC[G.diplome].map(s=>`<button class="btn btn-acc" onclick="choisirSpec('${s}')" ${G.specialisation===s?'disabled':''}>${G.specialisation===s?'✅ ':''} ${s} ${G.specialisation===s?'(actuel)':''}</button>`).join('')}`:'<p style="font-size:11px;color:var(--muted)">Diplôme suivant requis.</p>'}
+  </div>
+  ${(G.diplome==='BTS/IUT'||G.diplomeEnCours?.name==='BTS/IUT'||(G.diplome==='Licence'&&di>=DIPLOMES.indexOf('Licence')))?`
+  <div class="card">
+    <div class="card-title">💼 Alternance disponible</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:8px">L'alternance te permet de travailler en entreprise tout en étudiant. Revenus réduits mais expérience précieuse.</p>
+    ${!G.alternance?`<button class="btn btn-g" onclick="activerAlternance()">🔄 Entrer en alternance (+900€/mois, +5 charisme/an)</button>`:
+    `<div class="badge badge-g" style="display:block;margin-bottom:8px">✅ En alternance — ${fmt(900*12)}/an</div>
+    <button class="btn btn-r" onclick="stopAlternance()">Quitter l'alternance</button>`}
+  </div>`:''}
+  <div class="card">
+    <div class="card-title">Formations continues (max 2×/an)</div>
+    <button class="btn btn-b" onclick="seFormer('mooc',0,8,'intelligence')">💻 MOOC gratuit +8 intel</button>
+    <button class="btn btn-b" onclick="seFormer('certif',500,12,'intelligence')">📜 Certification (500 €) +12 intel</button>
+    <button class="btn btn-b" onclick="seFormer('formation',2500,16,'intelligence')">🏫 Formation intensive (2 500 €) +16 intel</button>
+    <button class="btn btn-g" onclick="seFormer('anglais',1200,10,'intelligence')">🇬🇧 Anglais (1 200 €) +10 intel</button>
+    <button class="btn" onclick="seFormer('prise_parole',500,10,'charisme')">🎤 Prise de parole (500 €) +10 charisme</button>
+    <button class="btn" onclick="seFormer('nego',700,8,'charisme')">🤝 Négociation (700 €) +8 charisme</button>
+  </div>`;
+}
+
+function commencerDiplome(nom, estPrive=false){
+  if(G.diplomeEnCours){showNotif('En cours','Un diplôme est déjà en cours.','warn');return;}
+  const coutsPublics={'BTS/IUT':0,'Licence':0,'Master':0,'MBA':12000,'Doctorat':0,'Grande École':10000};
+  const coutsPrives={'BTS/IUT':3500,'Licence':5000,'Master':8000,'MBA':25000,'Doctorat':0,'Grande École':0};
+  const durees={'BTS/IUT':3,'Licence':3,'Master':2,'MBA':1,'Doctorat':3,'Grande École':3};
+  const cout=estPrive?(coutsPrives[nom]||0):(coutsPublics[nom]||0);
+  if(G.argent<cout){showNotif('Fonds insuffisants',`Coût annuel: ${fmt(cout)}`,'warn');return;}
+  G.argent-=cout;
+  if(!G.niveauReussite) G.niveauReussite=60;
+  G.diplomeEnCours={name:nom,yearsLeft:durees[nom]||2,cout,estPrive,spec:null};
+  addLog(G.age,`📚 Début ${nom}${estPrive?' (privé)':' (public)'} — ${durees[nom]||2} ans${cout>0?` (${fmt(cout)}/an)`:''}`, 'info');
+  renderAll();
+}
+
+function travaillerPlus(){
+  if(!canDoAction('travailPlus',3)){showNotif('Limite','Max 3 fois par an.','warn');return;}
+  useAction('travailPlus');
+  if(!G.niveauReussite) G.niveauReussite=60;
+  G.niveauReussite=Math.min(100, G.niveauReussite+8);
+  G.intelligence=clamp(G.intelligence+5,0,100);
+  G.bonheur=clamp(G.bonheur-3);
+  addLog(G.age,'📖 Travail intensif : +8 réussite, +5 intel','good');
+  renderAll();
+}
+
+function seReposer(){
+  G.bonheur=clamp(G.bonheur+10);
+  addLog(G.age,'😴 Repos : +10 bonheur','good');
+  renderAll();
+}
+
+function activerAlternance(){
+  if(!G.alternance) G.alternance=true;
+  addLog(G.age,'🔄 Alternance activée ! +900€/mois en complément des études','good');
+  renderAll();
+}
+function stopAlternance(){ G.alternance=false; addLog(G.age,'Fin alternance.','warn'); renderAll(); }
+
+function choisirSpec(s){ G.specialisation=s; addLog(G.age,`🎯 Spécialisation: ${s}`,'good'); renderAll(); }
+
+function seFormer(type,cost,bonus,stat){
+  if(G.argent<cost){showNotif('Fonds insuffisants','','');return;}
+  if(!canDoAction('formation_'+stat,2)){showNotif('Limite','Max 2 formations/an.','warn');return;}
+  G.argent-=cost;
+  useAction('formation_'+stat);
+  if(stat==='intelligence')G.intelligence=clamp(G.intelligence+bonus,0,100);
+  else G.charisme=clamp(G.charisme+bonus,0,100);
+  addLog(G.age,`${type}: +${bonus} ${stat}`,'good');
+  renderAll();
+}
+
+// ─── EMPLOI ───────────────────────────────────────────────
+function rEmploi(){
+  const allJobs = JOBS_BY_SECTOR.general;
+  const partTimeJobs = allJobs.filter(j=>j.partTime && G.age>=(j.minAge||15));
+  const fullTimeJobs = allJobs.filter(j=>!j.partTime && G.age>=(j.minAge||18) && DIPLOMES.indexOf(G.diplome)>=DIPLOMES.indexOf(j.req||'Aucun'));
+  return `
+  <h2>💼 Emploi</h2>
+  ${G.job?`
+  <div class="card">
+    <div class="card-title">Poste actuel</div>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <span style="font-size:28px">${G.job.icon}</span>
+      <div>
+        <div style="font-size:14px;font-weight:700">${G.job.name}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${fmt(G.salaireBrut)}/an brut${G.job.partTime?' (temps partiel)':''} · Net: ${fmt(Math.round(G.salaireBrut*0.78/12))}/mois</div>
+        <div style="font-size:11px;color:var(--muted)">Niveau ${G.jobLevel+1}/5 · ${G.jobYears} ans d'ancienneté</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="metric"><div class="metric-v">${fmt(G.salaireBrut)}</div><div class="metric-l">Brut/an</div></div>
+      <div class="metric"><div class="metric-v">${fmt(Math.round(G.salaireBrut*0.78))}</div><div class="metric-l">Net/an</div></div>
+    </div>
+    ${!G.job.partTime?`<button class="btn btn-g" onclick="demanderAugmentation()">📈 Demander une augmentation</button>
+    <button class="btn btn-b" onclick="chercherPromotion()">⬆️ Postuler à une promotion interne</button>`:''}
+    <button class="btn btn-r" onclick="quitterEmploi()">🚪 Démissionner</button>
+  </div>`:
+  `<div class="card"><p style="color:var(--muted);font-size:12px;margin-bottom:10px">${G.age<15?'Tu peux travailler dès 15 ans (jobs à temps partiel).':G.age<18?'Jobs étudiants disponibles dès 15 ans.':'Sans emploi. Passe un entretien.'}</p></div>`}
+  ${G.age>=15&&!G.job&&partTimeJobs.length?`
+  <div class="card">
+    <div class="card-title">💼 Jobs étudiants / Temps partiel (dès ${G.age<16?'15 ans':G.age<18?'16 ans':'18 ans'})</div>
+    ${partTimeJobs.map((j,i)=>`
+    <div class="asset-card">
+      <div class="asset-info">
+        <div class="asset-name">${j.icon} ${j.name}</div>
+        <div class="asset-detail">${fmt(j.salBase)}/an · ${j.desc||''}</div>
+      </div>
+      <button class="inline-btn btn-g" onclick="passEntretien(${allJobs.indexOf(j)})">Postuler →</button>
+    </div>`).join('')}
+  </div>`:''}
+  ${G.age>=18?`
+  <div class="card">
+    <div class="card-title">Offres disponibles (temps plein)</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:8px">Diplôme: <span class="badge badge-acc">${G.diplome}</span> — L'entretien peut échouer selon tes stats.</p>
+    ${fullTimeJobs.length?fullTimeJobs.map((j)=>`
+    <div class="asset-card">
+      <div class="asset-info">
+        <div class="asset-name">${j.icon} ${j.name}</div>
+        <div class="asset-detail">${fmt(j.salBase)}/an brut · Net: ${fmt(Math.round(j.salBase*0.78/12))}/mois</div>
+        <div class="asset-detail">Potentiel: jusqu'à ${fmt(j.promoCeil)}/an</div>
+      </div>
+      <button class="inline-btn btn-g" onclick="passEntretien(${allJobs.indexOf(j)})">Entretien →</button>
+    </div>`).join(''):'<p style="color:var(--muted);font-size:11px">Aucun poste accessible avec ton diplôme actuel.</p>'}
+  </div>`:''}`;
+}
+
+function demanderAugmentation(){
+  if(!G.job)return;
+  const chance=Math.min(0.75,(G.charisme/100)*0.5+(G.jobYears/10)*0.3+0.1);
+  if(Math.random()<chance){
+    const pct=rng(3,8);
+    G.salaireBrut=Math.round(G.salaireBrut*(1+pct/100));
+    addLog(G.age,`📈 Augmentation +${pct}% ! → ${fmt(G.salaireBrut)}/an`,'good');
+  } else addLog(G.age,'📉 Augmentation refusée cette année.','bad');
+  renderAll();
+}
+
+function chercherPromotion(){
+  if(!G.job||G.jobLevel>=4)return;
+  const niveaux=JOBS_BY_SECTOR.general;
+  const curIdx=niveaux.findIndex(j=>j.name===G.job.name);
+  const suivant=niveaux[curIdx+1];
+  if(!suivant||DIPLOMES.indexOf(G.diplome)<DIPLOMES.indexOf(suivant.req||'Aucun')){showNotif('Prérequis','Diplôme ou expérience insuffisant(e).','warn');return;}
+  const chance=Math.min(0.70,(G.intelligence/100)*0.4+(G.charisme/100)*0.3+(G.jobYears/8)*0.2+0.1);
+  if(Math.random()<chance){
+    G.job=suivant;G.salaireBrut=suivant.salBase;G.jobLevel++;G.jobYears=0;
+    addLog(G.age,`⬆️ Promotion: ${suivant.name} ! Nouveau salaire: ${fmt(suivant.salBase)}`,'good');
+  } else addLog(G.age,'❌ Promotion refusée — continue à travailler.','bad');
+  renderAll();
+}
+
+function quitterEmploi(){ addLog(G.age,'🚪 Démission: '+G.job.name,'warn'); G.job=null; G.salaireBrut=0; renderAll(); }
+
+// ─── RACING ───────────────────────────────────────────────
+function rRacing(){
+  const r=G.racingCareer;
+  const sponsorList=['Total Énergies','Red Bull','Michelin','Sparco','OMP','Monster Energy','Castrol','Shell','Pirelli','Aramco'];
+  return `
+  <h2>🏎️ Motorsport</h2>
+  ${r?`
+  <div class="card">
+    <div style="background:linear-gradient(135deg,rgba(255,80,80,0.12),rgba(255,190,71,0.08));border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:700">${r.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${r.circuit}</div>
+    </div>
+    <div class="grid4">
+      <div class="metric"><div class="metric-v" style="color:var(--amber)">${r.victoires}</div><div class="metric-l">Victoires</div></div>
+      <div class="metric"><div class="metric-v">${r.courses}</div><div class="metric-l">Courses</div></div>
+      <div class="metric"><div class="metric-v" style="color:var(--green)">${fmt(r.gains)}</div><div class="metric-l">Gains totaux</div></div>
+      <div class="metric"><div class="metric-v">${Math.round(r.talent*100)}%</div><div class="metric-l">Talent</div></div>
+    </div>
+    <div class="sep"></div>
+    <div class="card-title">🎯 Actions (max 3×/an chacune)</div>
+    <button class="btn btn-b" onclick="sEntrainerRacing()" ${!canDoAction('racingTrain',3)?'disabled':''}>💪 S'entraîner (+3% talent, max 3×/an)</button>
+    <button class="btn btn-a" onclick="participerCourse()" ${!canDoAction('racingCourse',3)?'disabled':''}>🏁 Participer à une course (max 3×/an)</button>
+    <div class="card-title">Sponsors (${r.sponsors.length})</div>
+    ${r.sponsors.map(s=>`<div class="tag">${s.nom} — ${fmt(s.montant)}/an</div>`).join('')}
+    <button class="btn btn-g" style="margin-top:8px" onclick="chercherSponsor()">🤝 Chercher un sponsor</button>
+    <button class="btn btn-acc" onclick="monterNiveauRacing()">⬆️ Monter en catégorie (2 victoires min)</button>
+    ${r.niveau>=5&&!G.ecurie?`<button class="btn btn-a" onclick="racheterEcurie()">🏁 Racheter une écurie F1</button>`:''}
+  </div>
+  ${G.ecurie?`<div class="card"><div class="card-title">🏁 ${G.ecurie.nom}</div>
+    <div class="grid3">
+      <div class="metric"><div class="metric-v">${fmt(G.ecurie.budget)}</div><div class="metric-l">Budget</div></div>
+      <div class="metric"><div class="metric-v">${G.ecurie.pilotes.length}</div><div class="metric-l">Pilotes</div></div>
+      <div class="metric"><div class="metric-v">${G.ecurie.points}</div><div class="metric-l">Points</div></div>
+    </div></div>`:''}`:
+  `<div class="card">
+    <div class="card-title">Débuter une carrière motorsport</div>
+    ${[{n:'Karting amateur',icon:'🏎️',age:14,cout:5000,i:0},{n:'Rallye régional',icon:'🚗',age:18,cout:25000,i:1},{n:'Rallye national',icon:'🚗',age:20,cout:80000,i:2},{n:'Formule 3',icon:'🏎️',age:18,cout:200000,i:3},{n:'Formule 2',icon:'🏎️',age:20,cout:500000,i:4}].map(l=>`
+    <button class="btn ${G.argent>=(l.cout||0)&&G.age>=l.age?'btn-a':'disabled'}" onclick="rejoindreRacing(${l.i})" ${G.age<l.age||G.argent<l.cout?'disabled':''}>
+      ${l.icon} ${l.n} — Budget: ${fmt(l.cout)} — Min: ${l.age} ans
+    </button>`).join('')}
+  </div>`}`;
+}
+
+function sEntrainerRacing(){
+  const r=G.racingCareer;
+  if(!r)return;
+  if(!canDoAction('racingTrain',3)){showNotif('Limite','Max 3 entraînements par an.','warn');return;}
+  useAction('racingTrain');
+  const gain=0.025+Math.random()*0.015;
+  r.talent=Math.min(0.97,r.talent+gain);
+  G.sante=clamp(G.sante-3);
+  addLog(G.age,`💪 Entraînement intensif: talent +${Math.round(gain*100)}% → ${Math.round(r.talent*100)}%`,'good');
+  renderAll();
+}
+
+function participerCourse(){
+  const r=G.racingCareer;
+  if(!r)return;
+  if(!canDoAction('racingCourse',3)){showNotif('Limite','Max 3 courses par an.','warn');return;}
+  useAction('racingCourse');
+  r.courses++;
+  const podium=Math.random()<(0.15+r.talent*0.65);
+  const victoire=podium&&Math.random()<0.38;
+  const accident=Math.random()<(0.05*(1-r.talent));
+  if(accident){
+    const degat=rng(2000,20000);
+    G.sante=clamp(G.sante-rng(5,20));
+    addLog(G.age,`💥 Accident en course ! Dommages matériels: ${fmt(degat)}. Santé -${rng(5,20)}`,'bad');
+  } else if(victoire){
+    r.victoires++;
+    r.gains+=r.primeVictoire;
+    G.argent+=r.primeVictoire;
+    G.charisme=clamp(G.charisme+3);
+    addLog(G.age,`🏆 VICTOIRE ! ${r.circuit} → +${fmt(r.primeVictoire)}`,'good');
+  } else if(podium){
+    r.gains+=r.primePodium;
+    G.argent+=r.primePodium;
+    addLog(G.age,`🥈 Podium ! ${r.circuit} → +${fmt(r.primePodium)}`,'good');
+  } else {
+    addLog(G.age,`🏎️ Course ${r.circuit}: hors-points. Continue l'entraînement !`);
+  }
+  r.sponsors.forEach(s=>{ G.argent+=s.montant/4; });
+  renderAll();
+}
+
+function chercherSponsor(){
+  if(!G.racingCareer)return;
+  const sponsorList=['Total Énergies','Red Bull','Michelin','Sparco','Monster Energy','Castrol','Pirelli','Aramco'];
+  const s=sponsorList[rng(0,sponsorList.length-1)];
+  const montant=rng(5000,200000)*G.racingCareer.niveau;
+  const chance=Math.min(0.75,(G.charisme/100)*0.4+(G.racingCareer.victoires/10)+0.2);
+  if(Math.random()<chance){
+    G.racingCareer.sponsors.push({nom:s,montant});
+    addLog(G.age,`🤝 Sponsor ${s}: +${fmt(montant)}/an !`,'good');
+  } else addLog(G.age,`🤝 ${s} a refusé le sponsoring.`,'bad');
+  renderAll();
+}
+
+function monterNiveauRacing(){
+  const r=G.racingCareer;
+  if(r.niveau>=5){showNotif('Maximum','Tu es déjà en F1 !','info');return;}
+  if(r.victoires<2){showNotif('Pas assez','Il faut au moins 2 victoires.','warn');return;}
+  const couts=[0,25000,80000,200000,500000,0];
+  const suivantCout=couts[r.niveau];
+  if(G.argent<suivantCout){showNotif('Fonds insuffisants',`Budget requis: ${fmt(suivantCout)}`,'warn');return;}
+  G.argent-=suivantCout;
+  r.niveau++;r.courses=0;r.victoires=0;
+  const noms=['','Rallye régional','Rallye national','Formule 3','Formule 2','F1 rookie'];
+  const primes=[[0,0],[3000,1000],[15000,5000],[40000,15000],[100000,40000],[500000,200000]];
+  r.name=noms[r.niveau]; r.primeVictoire=primes[r.niveau][0]; r.primePodium=primes[r.niveau][1];
+  r.talent=Math.min(0.95,r.talent+0.05);
+  addLog(G.age,`🏎️ Passage en ${r.name} !`,'good');
+  renderAll();
+}
+
+// ─── ENTREPRISES ──────────────────────────────────────────
+function rEntreprises(){
+  if(!G.entreprises.length)return `<h2>🏢 Mes Entreprises</h2><div class="card"><p style="color:var(--muted)">Aucune entreprise. Crée ou reprends-en une depuis l'onglet ➕.</p></div>`;
+  return `
+  <h2>🏢 Mes Entreprises (${G.entreprises.length})</h2>
+  ${G.holding?`<div class="notice-g">🏛️ Holding ${G.holding.nom} active — IS optimisé régime mère-fille</div>`:''}
+  ${G.entreprises.map(e=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div>
+        <div style="font-size:15px;font-weight:700">${e.secteur.icon} ${e.nom}</div>
+        <div style="font-size:11px;color:var(--muted)">${e.secteur.name} · An ${e.annee} · Niveau ${e.niveau}/5</div>
+        ${e.offreRachat?`<div class="badge badge-a" style="margin-top:4px">💼 Offre: ${fmt(e.offreRachat.montant)} par ${e.offreRachat.acheteur}</div>`:''}
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${e.tresorerie>0?'var(--green)':'var(--red)'}">${fmt(e.tresorerie)}</div>
+        <div style="font-size:10px;color:var(--muted)">Trésorerie</div>
+      </div>
+    </div>
+    <div class="grid4">
+      <div class="metric"><div class="metric-v" style="font-size:11px">${e.employes}</div><div class="metric-l">Employés</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px">${fmt(e.valorisation)}</div><div class="metric-l">Valeur EV</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px;color:${e.resultatNet>=0?'var(--green)':'var(--red)'}">${fmt(e.resultatNet)}</div><div class="metric-l">Résultat</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px;color:var(--red)">${fmt(e.dette)}</div><div class="metric-l">Dette</div></div>
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">
+      <button class="inline-btn btn-g" onclick="openBizDetail('${e.id}')">Gérer →</button>
+      <button class="inline-btn btn-a" onclick="payerDividende('${e.id}')">💸 Dividende</button>
+      <button class="inline-btn btn-b" onclick="emprunterBanque('${e.id}')">🏦 Emprunt</button>
+      <button class="inline-btn btn-r" onclick="vendreBusiness('${e.id}')">💰 Vendre</button>
+    </div>
+  </div>`).join('')}
+  ${G.entreprises.length>=2&&!G.holding?`<button class="btn btn-p" onclick="creerHolding()">🏛️ Créer une Holding (5 000 €) — IS optimisé</button>`:''}
+  ${G.immo.length>=1&&!G.sci?`<button class="btn btn-p" onclick="creerSCI()">🏛️ Créer une SCI (3 000 €) — Foncier optimisé</button>`:''}
+  <button class="btn btn-r" style="margin-top:4px" onclick="racheterEntrepriseEnDifficulte()">🔴 Racheter une entreprise en difficulté</button>`;
+}
+
+function openBizDetail(id){
+  const e=G.entreprises.find(x=>x.id===id);
+  if(!e)return;
+  window._activeBizId=id;
+  setTab('creerbiz');
+}
+
+function payerDividende(id){
+  const e=G.entreprises.find(x=>x.id===id);
+  if(!e||e.tresorerie<5000){showNotif('Trésorerie insuffisante','','' );return;}
+  const div=Math.round(e.tresorerie*0.30);
+  const tax=div*0.30;
+  const net=div-tax;
+  e.tresorerie-=div;
+  G.argent+=net;
+  G.totalImpots+=tax;
+  addLog(G.age,`💸 Dividende ${e.nom}: ${fmt(div)} → net ${fmt(net)} (flat tax 30%)`,'good');
+  renderAll();
+}
+
+function emprunterBanque(id){
+  const e=G.entreprises.find(x=>x.id===id);
+  if(!e)return;
+  const max=Math.max(50000,e.valorisation*0.5);
+  showModal({
+    title:'🏦 Emprunt bancaire — '+e.nom,
+    desc:`Trésorerie actuelle: ${fmt(e.tresorerie)}\nCapacité d'emprunt estimée: ${fmt(max)}\nTaux: 4,5% sur 5 ans`,
+    choices:[
+      {t:`Emprunter ${fmt(Math.round(max*0.3))}`,fn:'doBizLoan',data:{id,montant:Math.round(max*0.3)}},
+      {t:`Emprunter ${fmt(Math.round(max*0.6))}`,fn:'doBizLoan',data:{id,montant:Math.round(max*0.6)}},
+      {t:`Emprunter ${fmt(Math.round(max))}`,fn:'doBizLoan',data:{id,montant:Math.round(max)}},
+      {t:'Annuler',e:{}},
+    ]
+  });
+}
+
+// ─── CRÉER BIZ ────────────────────────────────────────────
+function rCreerBiz(){
+  // Si un biz est sélectionné, afficher sa gestion détaillée
+  if(window._activeBizId){
+    const e=G.entreprises.find(x=>x.id===window._activeBizId);
+    if(e) return rBizDetail(e);
+  }
+  return `
+  <h2>➕ Créer / Reprendre</h2>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Épargne: <span style="color:var(--green);font-weight:700">${fmt(G.argent)}</span></p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+  ${SECTORS.map(s=>`
+  <div class="card" style="cursor:default">
+    <div style="font-size:22px;margin-bottom:6px">${s.icon}</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:2px">${s.name}</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${s.desc}</div>
+    <div class="grid2" style="margin-bottom:8px">
+      <div class="metric"><div class="metric-v" style="font-size:10px">${fmt(s.startMin)}–${fmt(s.startMax)}</div><div class="metric-l">Capital</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:10px">${fmt(s.revPer)}</div><div class="metric-l">CA/emp.</div></div>
+    </div>
+    <button class="btn btn-g" onclick="ouvrirModalCreerBiz('${s.id}')" ${G.argent<s.startMin?'disabled':''}>
+      ${G.argent<s.startMin?'Capital insuffisant':'Créer ce business'}
+    </button>
+    <button class="btn btn-b" onclick="chercherFinancement('${s.id}')">🤝 Chercher financement</button>
+  </div>`).join('')}
+  </div>`;
+}
+
+function rBizDetail(e){
+  const sec=e.secteur;
+  return `
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+    <button class="inline-btn" onclick="window._activeBizId=null;renderMain()">← Retour</button>
+    <h2 style="margin-bottom:0">${sec.icon} ${e.nom}</h2>
+  </div>
+  <div class="tabs">
+    <button class="tab ${(window._bizTab||'stock')==='stock'?'active':''}" onclick="window._bizTab='stock';renderMain()">📦 Stocks</button>
+    <button class="tab ${(window._bizTab||'')==='produits'?'active':''}" onclick="window._bizTab='produits';renderMain()">🏭 Produits</button>
+    <button class="tab ${(window._bizTab||'')==='rh'?'active':''}" onclick="window._bizTab='rh';renderMain()">👥 RH</button>
+    <button class="tab ${(window._bizTab||'')==='immo'?'active':''}" onclick="window._bizTab='immo';renderMain()">🏗️ Immo Pro</button>
+  </div>
+  ${(window._bizTab||'stock')==='stock'?rBizStock(e):
+    window._bizTab==='produits'?rBizProduits(e):
+    window._bizTab==='rh'?rBizRH(e):
+    rBizImmo(e)}`;
+}
+
+function rBizStock(e){
+  return `
+  <div class="card">
+    <div class="card-title">📦 Gestion des stocks</div>
+    ${e.stock.length?e.stock.map((s,i)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:12px;font-weight:600">${s.item.nom}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${fmtN(s.qte)} unités · ${fmt(s.item.unitCost||10)}/u</div>
+        ${s.qte<(s.item.consumePerMonth||10)*2?`<span class="badge badge-r">⚠️ Critique</span>`:''}
+      </div>
+      <div style="display:flex;gap:5px">
+        <button class="inline-btn btn-a" onclick="reappro('${e.id}',${i},100)">+100 (${fmt((s.item.unitCost||10)*100)})</button>
+        <button class="inline-btn btn-a" onclick="reappro('${e.id}',${i},500)">+500 (${fmt((s.item.unitCost||10)*500)})</button>
+      </div>
+    </div>`).join(''):'<p style="color:var(--muted);font-size:11px">Aucun stock.</p>'}
+    <div class="sep"></div>
+    <div class="card-title">Fournisseurs</div>
+    ${e.fournisseurs.map(f=>`<div class="tag">${f.nom} · Remise ${f.remise}% · Fiabilité ${f.fiabilite}%</div>`).join('')||'<p style="color:var(--muted);font-size:11px">Aucun fournisseur.</p>'}
+    <button class="btn btn-b" onclick="chercherFournisseur('${e.id}')">🔍 Chercher nouveau fournisseur</button>
+  </div>`;
+}
+
+function rBizProduits(e){
+  const secId=e.secteur.id;
+  const produitsCat=PRODUITS_SECTEUR[secId]||PRODUITS_SECTEUR.conseil;
+  return `
+  <div class="card">
+    <div class="card-title">🏭 Produits (${e.produits.length}/5)</div>
+    ${e.produits.map((p,i)=>`
+    <div style="background:var(--bg4);border-radius:8px;padding:10px;margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:600">${p.icon} ${p.nom}</span>
+        <button class="inline-btn btn-r" onclick="supprimerProduit('${e.id}',${i})">✕</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">
+        Prix vente: ${fmt(p.prixVente)} · Coût: ${fmt(p.coutUnit)} · Marge: <span style="color:${(1-p.coutUnit/p.prixVente)>0.35?'var(--green)':'var(--amber)'}">${Math.round((1-p.coutUnit/p.prixVente)*100)}%</span>
+      </div>
+      ${p.fournisseur?`<div style="font-size:10px;color:var(--muted)">🏭 ${p.fournisseur.nom} · Qualité: ${p.fournisseur.qualite}% · Relation: ${p.fournisseur.relation}%</div>`:''}
+      <div style="margin-top:6px">
+        <div id="prixlbl_${e.id}_${i}" style="font-size:10px;color:var(--muted);margin-bottom:2px">Prix de vente: <strong>${fmt(p.prixVente)}</strong></div>
+        <input type="range" min="${Math.max(1,Math.round(p.coutUnit*1.05))}" max="${Math.round((p.prixBase||p.prixVente*2)*2.5)}" value="${p.prixVente}"
+          oninput="ajusterPrix('${e.id}',${i},this.value);document.getElementById('prixlbl_${e.id}_${i}').innerHTML='Prix de vente: <strong>'+Math.round(this.value).toLocaleString(\'fr-FR\')+' €</strong>'"
+          style="width:100%;accent-color:var(--accent)">
+      </div>
+      ${p.fournisseur?`<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+        <button class="inline-btn btn-acc" onclick="negotierFournisseur('${e.id}',${i},'repas')">🍽️ Repas (500€) +rel</button>
+        <button class="inline-btn btn-b" onclick="negotierFournisseur('${e.id}',${i},'cadeau')">🎁 Cadeau (300€)</button>
+        <button class="inline-btn btn-g" onclick="negotierFournisseur('${e.id}',${i},'padel')">🏓 Padel (150€)</button>
+      </div>`:''}
+    </div>`).join('')}
+    ${e.produits.length<5?`<button class="btn btn-g" onclick="ouvrirModalProduit('${e.id}')">➕ Nouveau produit (${e.secteur.name})</button>`:'<p style="font-size:11px;color:var(--muted)">Maximum 5 produits.</p>'}
+  </div>`;
+}
+
+function ajusterPrix(bizId,prodIdx,newPrix){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e||!e.produits[prodIdx])return;
+  e.produits[prodIdx].prixVente=Math.round(newPrix);
+}
+
+function negotierFournisseur(bizId,prodIdx,type){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e||!e.produits[prodIdx])return;
+  const p=e.produits[prodIdx];
+  if(!p.fournisseur)return;
+  const costs={repas:500,cadeau:300,padel:150};
+  const gains={repas:12,cadeau:8,padel:6};
+  const c=costs[type];
+  if(G.argent<c){showNotif('Fonds insuffisants',`Besoin: ${fmt(c)}`,'warn');return;}
+  G.argent-=c;
+  p.fournisseur.relation=Math.min(100,(p.fournisseur.relation||50)+gains[type]);
+  if(p.fournisseur.relation>=70){
+    const remise=0.02+Math.random()*0.06;
+    p.coutUnit=Math.max(1,Math.round(p.coutUnit*(1-remise)));
+    addLog(G.age,`🤝 ${type} avec ${p.fournisseur.nom}: relation +${gains[type]} · Prix −${Math.round(remise*100)}% !`,'good');
+  } else {
+    addLog(G.age,`🤝 ${type} avec ${p.fournisseur.nom}: relation +${gains[type]}`,'good');
+  }
+  renderAll();
+}
+
+function rBizRH(e){
+  const massSal=e.employes*36000*1.42;
+  return `
+  <div class="card">
+    <div class="card-title">👥 Ressources Humaines</div>
+    <div class="grid2" style="margin-bottom:10px">
+      <div class="metric"><div class="metric-v">${e.employes}</div><div class="metric-l">Effectif</div></div>
+      <div class="metric"><div class="metric-v">${fmt(massSal)}</div><div class="metric-l">Masse sal.</div></div>
+    </div>
+    <button class="btn btn-g" onclick="embaucher('${e.id}')" ${e.tresorerie<42000?'disabled':''}>👤 Embaucher (42 000 € chargé) — Tréso min 42k</button>
+    ${e.employes>1?`<button class="btn btn-r" onclick="licencier('${e.id}')">❌ Licencier (ind. 15 000 €)</button>`:''}
+    ${e.vehiculesFonction.length<3?`<button class="btn btn-a" onclick="ajouterVehFonction('${e.id}')">🚗 Ajouter voiture de fonction (déductible)</button>`:''}
+    ${e.vehiculesFonction.length>0?`<div class="card-title">Véhicules de fonction</div>${e.vehiculesFonction.map(v=>`<div class="tag">🚗 ${v.name}</div>`).join('')}`:''}
+  </div>`;
+}
+
+function rBizImmo(e){
+  return `
+  <div class="card">
+    <div class="card-title">🏗️ Immobilier d'entreprise</div>
+    ${e.immoEntreprise.length?e.immoEntreprise.map(b=>`<div class="asset-card"><div class="asset-info"><div class="asset-name">${b.name}</div><div class="asset-detail">${fmt(b.valeur)} · Amort.</div></div></div>`).join(''):'<p style="font-size:11px;color:var(--muted)">Pas d\'actifs immobiliers.</p>'}
+    <button class="btn btn-b" onclick="acheterImmoEntreprise('${e.id}')">🏢 Acheter local/bureau (déductible IS)</button>
+  </div>`;
+}
+
+// ─── COMPTA ───────────────────────────────────────────────
+function rCompta(){
+  if(!G.entreprises.length)return`<h2>📊 Comptabilité</h2><p style="color:var(--muted)">Aucune entreprise.</p>`;
+  const selId=window._comptaBizId||G.entreprises[0].id;
+  const e=G.entreprises.find(x=>x.id===selId)||G.entreprises[0];
+  return `
+  <h2>📊 Comptabilité</h2>
+  <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
+    ${G.entreprises.map(x=>`<button class="tab ${x.id===selId?'active':''}" onclick="window._comptaBizId='${x.id}';renderMain()">${x.nom}</button>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">Bilan cumulé — ${e.nom}</div>
+    <div class="grid4">
+      <div class="metric"><div class="metric-v" style="font-size:11px">${fmt(e.ca)}</div><div class="metric-l">CA total</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px">${fmt(e.chargesTotal)}</div><div class="metric-l">Charges</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px;color:var(--red)">${fmt(e.is)}</div><div class="metric-l">IS payé</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px;color:${e.resultatNet>=0?'var(--green)':'var(--red)'}">${fmt(e.resultatNet)}</div><div class="metric-l">Résultat net</div></div>
+    </div>
+    <div class="grid3">
+      <div class="metric"><div class="metric-v" style="font-size:11px;color:var(--amber)">${fmt(e.tva)}</div><div class="metric-l">TVA versée</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px;color:var(--red)">${fmt(e.dette)}</div><div class="metric-l">Dette banc.</div></div>
+      <div class="metric"><div class="metric-v" style="font-size:11px">${fmt(e.valorisation)}</div><div class="metric-l">Valorisation</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Historique exercices</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>An</th><th>CA</th><th>Mass.sal</th><th>Loyer</th><th>Mktg</th><th>EBIT</th><th>IS</th><th>TVA</th><th style="color:var(--green)">Net</th></tr></thead>
+      <tbody>${e.exercices.map(ex=>`<tr>
+        <td>${ex.an}</td><td style="color:var(--blue)">${fmt(ex.ca)}</td><td>${fmt(ex.massSal)}</td><td>${fmt(ex.loyer)}</td><td>${fmt(ex.marketing)}</td>
+        <td>${fmt(ex.ebit)}</td><td style="color:var(--red)">${fmt(ex.is)}</td><td style="color:var(--amber)">${fmt(ex.tva)}</td>
+        <td style="color:${ex.net>=0?'var(--green)':'var(--red)'}"><strong>${fmt(ex.net)}</strong></td>
+      </tr>`).join('')||'<tr><td colspan="9" style="color:var(--muted);padding:10px">En attente du premier exercice.</td></tr>'}</tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚖️ Obligations légales</div>
+    <div style="font-size:11px;line-height:1.9;color:var(--muted)">
+      <div>• <strong style="color:var(--text)">IS</strong>: 15% jusqu'à 42 500 € · 25% au-delà (PME)</div>
+      <div>• <strong style="color:var(--text)">TVA</strong>: ${(e.secteur.tvaR*100).toFixed(0)}% secteur · Déclaration mensuelle</div>
+      <div>• <strong style="color:var(--text)">Masse salariale</strong>: +42% charges patronales</div>
+      <div>• <strong style="color:var(--text)">CFE + CVAE</strong>: incluses dans les charges</div>
+      <div>• <strong style="color:var(--text)">Dividendes</strong>: Flat tax 30% (17,2% PS + 12,8% IR)</div>
+      ${G.holding?'<div>• <strong style="color:var(--green)">Holding</strong>: Régime mère-fille — IS réduit 25%</div>':''}
+      ${G.sci?'<div>• <strong style="color:var(--green)">SCI</strong>: Revenus fonciers à l\'IS (25%)</div>':''}
+    </div>
+  </div>`;
+}
+
+// ─── FISCAL ───────────────────────────────────────────────
+function rFiscal(){
+  return `
+  <h2>⚖️ Fiscal & Montages</h2>
+  <div class="card">
+    <div class="card-title">Montages actifs</div>
+    ${G.fiscalMontages.length?G.fiscalMontages.map(m=>`<div class="badge badge-g" style="display:block;margin-bottom:4px">✅ ${m}</div>`).join(''):'<p style="font-size:11px;color:var(--muted)">Aucun montage actif.</p>'}
+  </div>
+  <div class="card">
+    <div class="card-title">🏛️ Structures légales</div>
+    <button class="btn btn-p" onclick="creerHolding()" ${G.holding||G.entreprises.length<2?'disabled':''}>🏛️ Holding SAS (5 000 €) ${G.holding?'— Déjà créée':G.entreprises.length<2?'— 2 entreprises requises':''}</button>
+    <button class="btn btn-p" onclick="creerSCI()" ${G.sci||G.immo.length<1?'disabled':''}>🏛️ SCI pour l\'immobilier (3 000 €) ${G.sci?'— Déjà créée':G.immo.length<1?'— 1 bien requis':''}</button>
+    <button class="btn btn-b" onclick="ouvrirLMP()">📋 Statut LMP / LMNP (location meublée)</button>
+    <button class="btn btn-b" onclick="ouvrirPEA()">📊 Plan d'Épargne en Actions (PEA)</button>
+  </div>
+  <div class="card">
+    <div class="card-title">⚠️ Zone grise / Fraude fiscale</div>
+    <div class="notice-a">Attention: la fraude fiscale est un délit pénal. Risque pénal croissant avec le niveau.</div>
+    ${G.fraudeActive?`<div class="notice-r" style="background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);border-radius:6px;padding:8px;margin-bottom:8px;font-size:11px;color:var(--red)">🔴 Fraude active: Niveau ${G.fraudeNiveau} · Risque détection: ${Math.round(G.fraudeRisque)}%</div>
+    <button class="btn btn-g" onclick="stopFraude()">🛑 Stopper la fraude (régularisation)</button>`:
+    `<button class="btn btn-a" onclick="activerFraude(1)">📑 Facturation gonflée · Risque faible · +8% IS économisé</button>
+    <button class="btn btn-r" onclick="activerFraude(2)">🏝️ Compte offshore · Risque moyen · +16% IS économisé</button>
+    ${G.entreprises.length?`<button class="btn btn-r" onclick="activerFraude(3)">💸 Blanchiment via filiales · Risque élevé · +24% IS économisé</button>`:''}`}
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Récap fiscal personnel</div>
+    <div class="grid2">
+      <div class="metric"><div class="metric-v" style="color:var(--red)">${fmt(G.totalImpots)}</div><div class="metric-l">Impôts à vie</div></div>
+      <div class="metric"><div class="metric-v">${fmt(G.totalRevenu)}</div><div class="metric-l">Revenus bruts</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">Taux effectif: ${G.totalRevenu>0?Math.round(G.totalImpots/G.totalRevenu*100):0}%</div>
+  </div>`;
+}
+
+function stopFraude(){ G.fraudeActive=false;G.fraudeNiveau=0;G.fraudeRisque=0;addLog(G.age,'Arrêt fraude fiscale — régularisation.','info');renderAll(); }
+function ouvrirLMP(){ showNotif('Statut LMNP/LMP','Ce statut permet de déduire l\'amortissement de tes biens meublés (réduction IR).\nDisponible dès que tu loues un bien meublé.','info'); }
+function ouvrirPEA(){ showNotif('PEA','Plan d\'Épargne en Actions — plafond 150 000 €, exonéré après 5 ans.\nGère-le depuis l\'onglet Placements.','info'); }
+
+// ─── LOGEMENT ────────────────────────────────────────────
+function rLogement(){
+  const locations=REAL_ESTATE.filter(b=>b.type==='location');
+  const achats=REAL_ESTATE.filter(b=>b.type==='achat');
+  return `
+  <h2>🏠 Logement</h2>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:12px">
+    ${G.logement?
+      G.logement.type==='location'?`📍 Location: ${G.logement.name} — ${fmt(G.logement.loyer)}/mois`:
+      `🏠 Propriétaire: ${G.logement.name}`
+      :'Sans domicile fixe'}
+  </p>
+  ${G.logement?`<button class="btn btn-r" style="margin-bottom:12px" onclick="quitterLogement()">🚪 Quitter ce logement</button>`:''}
+  <div class="tabs">
+    <button class="tab ${(window._logtab||'loc')==='loc'?'active':''}" onclick="window._logtab='loc';renderMain()">Locations</button>
+    <button class="tab ${(window._logtab||'')==='achat'?'active':''}" onclick="window._logtab='achat';renderMain()">Achats</button>
+    <button class="tab ${(window._logtab||'')==='portfolio'?'active':''}" onclick="window._logtab='portfolio';renderMain()">Mon parc (${G.immo.length})</button>
+  </div>
+  ${(window._logtab||'loc')==='loc'?rLouer(locations):
+    window._logtab==='achat'?rAcheterImmo(achats):
+    rPortfolioImmo()}`;
+}
+
+function rLouer(list){
+  return list.map(b=>`
+  <div class="mkt-item">
+    <div class="mkt-head">
+      <div><span class="mkt-title">${b.icon} ${b.name}</span> <span class="badge badge-b">${b.cat}</span></div>
+      <span class="mkt-price">${fmt(b.price)}/mois</span>
+    </div>
+    <div class="mkt-meta">📍 ${b.city} · Charges: ${fmt(b.charges)}/mois · Total: ${fmt(b.price+b.charges)}/mois</div>
+    <div class="mkt-meta">${b.rooms} ch. · ${b.bath} SdB · ${b.desc}</div>
+    <div class="floor-plan">${FLOOR_PLANS[b.plan]||''}</div>
+    <button class="inline-btn btn-b" onclick="louerLogement('${b.id}')" ${G.argent<b.price*2?'disabled':''}>
+      ${G.logement?.id===b.id?'✅ Actuel':G.argent<b.price*2?`Besoin ${fmt(b.price*2)} (2 mois)` :'Louer'}
+    </button>
+  </div>`).join('');
+}
+
+function rAcheterImmo(list){
+  return list.map(b=>`
+  <div class="mkt-item">
+    <div class="mkt-head">
+      <div><span class="mkt-title">${b.icon} ${b.name}</span> <span class="badge badge-a">${b.surface}m²</span></div>
+      <span class="mkt-price">${fmt(b.price)}</span>
+    </div>
+    <div class="mkt-meta">📍 ${b.city} · ${b.rooms} ch. · ${b.bath} SdB · Notaire: ${fmt(b.fraisN)} · Rend: ${b.rendL}%/an</div>
+    <div class="floor-plan">${FLOOR_PLANS[b.plan]||''}</div>
+    <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
+      <button class="inline-btn btn-g" onclick="acheterImmo('${b.id}','comptant')" ${G.argent<b.price+b.fraisN?'disabled':''}>Comptant (${fmt(b.price+b.fraisN)})</button>
+      <button class="inline-btn btn-a" onclick="acheterImmo('${b.id}','credit')" ${G.argent<b.price*0.1+b.fraisN?'disabled':''}>Crédit (apport ${fmt(b.price*0.1+b.fraisN)})</button>
+    </div>
+  </div>`).join('');
+}
+
+function rPortfolioImmo(){
+  if(!G.immo.length)return`<p style="color:var(--muted);font-size:12px">Aucun bien détenu.</p>`;
+  return G.immo.map((b,i)=>`
+  <div class="mkt-item">
+    <div class="mkt-head">
+      <span class="mkt-title">${b.icon} ${b.name}</span>
+      <span class="mkt-price">${fmt(b.valeur)}</span>
+    </div>
+    <div class="mkt-meta">📍 ${b.city} · Acheté ${fmt(b.prixAchat)} · +${Math.round((b.valeur/b.prixAchat-1)*100)}%</div>
+    ${b.credit?`<div class="mkt-meta">Crédit: ${fmt(b.credit.mensualite)}/mois · Reste: ${fmt(b.credit.remaining)}</div>`:''}
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+      <button class="inline-btn ${b.loue?'btn-a':'btn-g'}" onclick="toggleLouer(${i})">${b.loue?'🏠 Loué (stopper)':'Mettre en location'}</button>
+      <button class="inline-btn btn-r" onclick="vendreImmo(${i})">Vendre ${fmt(Math.round(b.valeur))}</button>
+    </div>
+  </div>`).join('');
+}
+
+function louerLogement(id){
+  const b=REAL_ESTATE.find(x=>x.id===id);
+  if(!b)return;
+  if(G.argent<b.price*2){showNotif('Insuffisant',`2 mois de loyer requis: ${fmt(b.price*2)}`,'warn');return;}
+  G.argent-=b.price*1;
+  G.logement={type:'location',id:b.id,name:b.name,loyer:b.price+b.charges,city:b.city,icon:b.icon};
+  G.bonheur=clamp(G.bonheur+8);
+  addLog(G.age,`🏠 Location: ${b.name} (${fmt(b.price+b.charges)}/mois)`,'good');
+  renderAll();
+}
+
+function quitterLogement(){
+  if(G.logement){addLog(G.age,'Quitte: '+G.logement.name,'warn');G.logement=null;renderAll();}
+}
+
+function acheterImmo(id,mode){
+  const b=REAL_ESTATE.find(x=>x.id===id);
+  if(!b)return;
+  if(mode==='comptant'){
+    if(G.argent<b.price+b.fraisN){showNotif('Insuffisant','','');return;}
+    G.argent-=b.price+b.fraisN;
+    const bien={id:b.id,name:b.name,city:b.city,icon:b.icon,valeur:b.price,prixAchat:b.price,loue:false,loyerM:Math.round(b.price*b.rendL/100/12),credit:null};
+    G.immo.push(bien);
+    G.logement={type:'proprio',id:b.id,name:b.name};
+    addLog(G.age,`🏠 Achat comptant: ${b.name} (${fmt(b.price+b.fraisN)})`,'good');
+  } else {
+    const apport=b.price*0.1+b.fraisN;
+    if(G.argent<apport){showNotif('Apport insuffisant',`Besoin: ${fmt(apport)}`,'warn');return;}
+    G.argent-=apport;
+    const emprunt=b.price*0.9;
+    const mensualite=Math.round(emprunt/240*1.038);
+    G.dettes+=emprunt;
+    const bien={id:b.id,name:b.name,city:b.city,icon:b.icon,valeur:b.price,prixAchat:b.price,loue:false,loyerM:Math.round(b.price*b.rendL/100/12),credit:{emprunt,mensualite,remaining:emprunt}};
+    G.immo.push(bien);
+    G.logement={type:'proprio',id:b.id,name:b.name};
+    addLog(G.age,`🏠 Achat crédit: ${b.name} — Mensualité: ${fmt(mensualite)}`,'good');
+  }
+  renderAll();
+}
+
+function toggleLouer(idx){
+  const b=G.immo[idx];
+  b.loue=!b.loue;
+  addLog(G.age,b.loue?`Mise en location: ${b.name} (${fmt(b.loyerM)}/mois)`:`Fin location: ${b.name}`);
+  renderAll();
+}
+
+function vendreImmo(idx){
+  const b=G.immo[idx];
+  const pv=b.valeur-b.prixAchat;
+  const tax=pv>0&&G.immo.length>1?pv*0.36:0;
+  G.argent+=b.valeur-tax;
+  G.totalImpots+=tax;
+  if(G.logement?.id===b.id)G.logement=null;
+  addLog(G.age,`Vente ${b.name}: ${fmt(b.valeur)} (PV taxée: ${fmt(tax)})`,'good');
+  G.immo.splice(idx,1);
+  renderAll();
+}
+
+// ─── VEHICULES ───────────────────────────────────────────
+function rVehicules(){
+  const cats=['Voiture','Moto','Bateau','Avion'];
+  const selCat=window._vCat||'Voiture';
+  const filtered=_vehicles.filter(v=>v.cat===selCat);
+  return `
+  <h2>🚗 Véhicules</h2>
+  ${G.vehicules.length?`
+  <div class="card">
+    <div class="card-title">Mes véhicules</div>
+    ${G.vehicules.map((v,i)=>{
+      const val=Math.max(0,Math.round(v.price*Math.pow(1-v.depreciation,G.age-v.buyAge)));
+      return `<div class="asset-card">
+        <div class="asset-info"><div class="asset-name">${v.icon} ${v.name}</div>
+        <div class="asset-detail">${v.year} · ${v.fuel} · Valeur: ${fmt(val)} · Charges: ${fmt(v.running)}/an</div></div>
+        <button class="inline-btn btn-r" onclick="vendreVehicule(${i})">Vendre ${fmt(val)}</button>
+      </div>`;
+    }).join('')}
+  </div>`:'' }
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="tabs" style="margin-bottom:0">
+      ${cats.map(c=>`<button class="tab ${selCat===c?'active':''}" onclick="window._vCat='${c}';renderMain()">${c}</button>`).join('')}
+    </div>
+    <button class="inline-btn btn-b" onclick="refreshMarket()">🔄 Actualiser marché</button>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:8px">${filtered.length} annonces · Épargne: <strong style="color:var(--green)">${fmt(G.argent)}</strong></p>
+  ${filtered.map(v=>`
+  <div class="mkt-item">
+    <div class="mkt-head">
+      <div><span class="mkt-title">${v.icon} ${v.name}</span> <span class="badge badge-b">${v.type}</span></div>
+      <span class="mkt-price">${fmt(v.price)}</span>
+    </div>
+    <div class="mkt-meta">${v.year} · ${v.fuel} · ${v.color}${v.km?` · ${fmtN(v.km)} km`:''} · 📍 ${v.loc}</div>
+    <div class="mkt-meta">Charges/an: ${fmt(v.running)} · Dépréc.: ${(v.depreciation*100).toFixed(0)}%/an</div>
+    <button class="inline-btn btn-g" onclick="acheterVehicule('${v.id}')" ${G.argent<v.price?'disabled':''}>
+      ${G.argent<v.price?'Fonds insuff.':'Acheter'}
+    </button>
+  </div>`).join('')}`;
+}
+
+function refreshMarket(){ _mktSeed=Date.now(); _vehicles=genVehicles(_mktSeed); addLog(G.age,'Marché véhicules actualisé.','info'); renderMain(); }
+function acheterVehicule(id){ const v=_vehicles.find(x=>x.id===id); if(!v||G.argent<v.price){showNotif('Fonds insuffisants','','');return;} G.argent-=v.price; G.vehicules.push({...v,buyAge:G.age}); addLog(G.age,`🚗 Achat: ${v.name} (${fmt(v.price)})`,'good'); renderAll(); }
+function vendreVehicule(idx){ const v=G.vehicules[idx]; const val=Math.max(0,Math.round(v.price*Math.pow(1-v.depreciation,G.age-v.buyAge))); G.argent+=val; addLog(G.age,`Vente: ${v.name} → ${fmt(val)}`); G.vehicules.splice(idx,1); renderAll(); }
+
+// ─── PLACEMENTS ──────────────────────────────────────────
+function rPlacements(){
+  return `
+  <h2>📈 Placements financiers</h2>
+  <div class="grid3">
+    <div class="metric"><div class="metric-v" style="color:var(--green)">${fmt(G.livretA)}</div><div class="metric-l">Livret A</div></div>
+    <div class="metric"><div class="metric-v" style="color:var(--blue)">${fmt(G.pea)}</div><div class="metric-l">PEA</div></div>
+    <div class="metric"><div class="metric-v" style="color:var(--amber)">${fmt(G.crypto)}</div><div class="metric-l">Crypto</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💚 Livret A — 3% garantis · Plafond ${fmt(G.livretACap)}</div>
+    ${[500,2000,5000,10000,22950].map(m=>`<button class="btn btn-g" onclick="placer('livretA',${m})" ${G.argent<m||G.livretA>=G.livretACap?'disabled':''}>+${fmt(m)}</button>`).join('')}
+    ${G.livretA>0?`<button class="btn btn-r" onclick="retirer('livretA')">Retirer (${fmt(G.livretA)})</button>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title">📊 PEA Bourse — variable · Plafond ${fmt(G.peaCap)} · Exo. après 5 ans</div>
+    ${[1000,5000,15000,50000].map(m=>`<button class="btn btn-b" onclick="placer('pea',${m})" ${G.argent<m||G.pea>=G.peaCap?'disabled':''}>+${fmt(m)}</button>`).join('')}
+    ${G.pea>0?`<button class="btn btn-r" onclick="retirer('pea')">Vendre (${fmt(G.pea)})</button>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title">₿ Crypto — Très volatil · Flat tax 30%</div>
+    ${[200,1000,5000,20000].map(m=>`<button class="btn btn-a" onclick="placer('crypto',${m})" ${G.argent<m?'disabled':''}>+${fmt(m)}</button>`).join('')}
+    ${G.crypto>0?`<button class="btn btn-r" onclick="retirer('crypto')">Vendre (flat tax 30%) → ${fmt(G.crypto*0.70)}</button>`:''}
+  </div>`;
+}
+
+function placer(type,m){ if(G.argent<m){return;} G.argent-=m; G[type]+=m; addLog(G.age,`Placement ${type}: +${fmt(m)}`); renderAll(); }
+function retirer(type){ const m=type==='crypto'?G.crypto*0.70:G[type]; G.argent+=m; G[type]=0; addLog(G.age,`Retrait ${type}: +${fmt(m)}`); renderAll(); }
+
+// ─── MARKETPLACE ─────────────────────────────────────────
+function rMarketplace(){
+  const q=window._mktQ||'';
+  const allItems=[
+    ..._vehicles.map(v=>({...v,type:'vehicule',badge:v.type,badgeCol:'b',search:v.name+v.loc+v.fuel+v.type})),
+    ...REAL_ESTATE.filter(b=>b.type==='achat').map(b=>({...b,badge:'Immobilier',badgeCol:'a',price:b.price,search:b.name+b.city+b.cat})),
+  ];
+  const filtered=q?allItems.filter(x=>x.search.toLowerCase().includes(q.toLowerCase())):allItems;
+  return `
+  <h2>🛒 Marketplace</h2>
+  <div style="display:flex;gap:6px;margin-bottom:10px">
+    <input type="text" placeholder="🔍 Tesla, Paris, bateau, penthouse..." value="${q}" oninput="window._mktQ=this.value;renderMain()" style="flex:1">
+    <button class="inline-btn" onclick="window._mktQ='';renderMain()">✕</button>
+    <button class="inline-btn btn-b" onclick="refreshMarket()">🔄</button>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px">${filtered.length} résultats · ${fmt(G.argent)} disponibles</p>
+  ${filtered.slice(0,30).map(item=>`
+  <div class="mkt-item">
+    <div class="mkt-head">
+      <div><span class="mkt-title">${item.icon||'📋'} ${item.name}</span> <span class="badge badge-${item.badgeCol}">${item.badge}</span></div>
+      <span class="mkt-price">${fmt(item.price)}</span>
+    </div>
+    <div class="mkt-meta">${item.type==='vehicule'?`${item.year||''} · ${item.fuel||''} · 📍 ${item.loc}`:`📍 ${item.city||''}`}</div>
+    <button class="inline-btn btn-g" onclick="${item.type==='vehicule'?`acheterVehicule('${item.id}')`:`acheterImmo('${item.id}','credit')`}" ${G.argent<item.price*0.1?'disabled':''}>
+      ${G.argent>=item.price?'Acheter':G.argent>=item.price*0.1?'Crédit':'Insuff.'}
+    </button>
+  </div>`).join('')}`;
+}
+
+// ─── BILAN ────────────────────────────────────────────────
+function rBilan(){
+  const pat=getPatrimoine();
+  return `
+  <h2>💰 Bilan personnel</h2>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:12px">Score: <span class="badge badge-acc">${calcScore()}/1000</span></p>
+  <div class="card">
+    <div class="card-title">🏦 Actif</div>
+    ${[
+      ['Épargne liquide',G.argent,'var(--green)'],
+      ['Livret A',G.livretA,''],
+      ['PEA',G.pea,''],
+      ['Crypto',G.crypto,'var(--amber)'],
+      ...G.immo.map(b=>[`${b.icon} ${b.name}`,b.valeur,'']),
+      ...G.vehicules.map(v=>[`${v.icon} ${v.name}`,Math.max(0,v.price*Math.pow(1-v.depreciation,G.age-v.buyAge)),'']),
+      ...G.entreprises.map(e=>[`${e.secteur.icon} ${e.nom} (valeur)`,e.valorisation,'']),
+    ].map(([n,v,c])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+      <span style="color:var(--muted)">${n}</span><span style="font-family:var(--mono);color:${c||'var(--text)'}">${fmt(Math.round(v||0))}</span>
+    </div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px;font-weight:700">
+      <span>TOTAL ACTIF</span><span style="font-family:var(--mono);color:var(--green)">${fmt(pat+G.dettes)}</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📉 Passif</div>
+    <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Crédits immobiliers</span><span style="font-family:var(--mono);color:var(--red)">${fmt(G.dettes)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-top:8px">
+      <span>ACTIF NET</span><span style="font-family:var(--mono);color:${pat>0?'var(--green)':'var(--red)'}">${fmt(pat)}</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Flux annuels</div>
+    <div style="font-size:11px;display:flex;flex-direction:column;gap:4px">
+      ${G.salaireBrut?`<div style="display:flex;justify-content:space-between"><span>Salaire net-net</span><span style="color:var(--green)">${fmt(Math.round((G.salaireBrut*0.78-calcIR(G.salaireBrut*0.78))/12))}/mois</span></div>`:''}
+      ${G.logement?.type==='location'?`<div style="display:flex;justify-content:space-between"><span>Loyer</span><span style="color:var(--red)">-${fmt(G.logement.loyer)}/mois</span></div>`:''}
+      ${G.vehicules.length?`<div style="display:flex;justify-content:space-between"><span>Charges véhicules</span><span style="color:var(--red)">-${fmt(G.vehicules.reduce((a,v)=>a+v.running,0))}/an</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-weight:700"><span>Impôts payés à vie</span><span style="color:var(--red);font-family:var(--mono)">${fmt(G.totalImpots)}</span></div>
+    </div>
+  </div>`;
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function reappro(bizId,idx,qty){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e)return;
+  const s=e.stock[idx];
+  const cout=(s.item.unitCost||10)*qty;
+  if(e.tresorerie<cout){showNotif('Trésorerie insuffisante',`Besoin: ${fmt(cout)}`,'warn');return;}
+  e.tresorerie-=cout; s.qte+=qty;
+  addLog(G.age,`Réappro ${s.item.nom}: +${qty} (${fmt(cout)})`);
+  renderAll();
+}
+
+function embaucher(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e||e.tresorerie<42000){showNotif('Trésorerie insuffisante','','')}
+  else{e.tresorerie-=42000;e.employes++;addLog(G.age,`Embauche ${e.nom}: effectif ${e.employes}`,'good');}
+  renderAll();
+}
+
+function licencier(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e||e.employes<=1)return;
+  e.tresorerie-=15000;e.employes--;
+  addLog(G.age,`Licenciement ${e.nom} (ind: 15k€). Effectif: ${e.employes}`,'warn');
+  renderAll();
+}
+
+function chercherFournisseur(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e)return;
+  const fournisseurs=['Alibaba Direct','Groupe Sigma','Euro Supply Co.','FastLogistic','MedPro Distribution','TechParts EU'];
+  const nom=fournisseurs[rng(0,fournisseurs.length-1)];
+  const remise=rng(5,25);
+  const fiab=rng(70,98);
+  const chance=Math.min(0.85,0.5+(G.charisme/200));
+  if(Math.random()<chance){
+    if(e.fournisseurs.length>=3)e.fournisseurs.shift();
+    e.fournisseurs.push({nom,remise,fiabilite:fiab});
+    addLog(G.age,`🤝 Nouveau fournisseur: ${nom} (remise ${remise}%)`,'good');
+  } else addLog(G.age,`Fournisseur ${nom} n'a pas donné suite`,'bad');
+  renderAll();
+}
+
+function ouvrirModalCreerBiz(secId){
+  const sec=SECTORS.find(s=>s.id===secId);
+  window._pendingBizSec=secId;
+  showModal({
+    title:`${sec.icon} Créer ${sec.name}`,
+    desc:`Capital requis: ${fmt(sec.startMin)} à ${fmt(sec.startMax)}\nTon épargne: ${fmt(G.argent)}\n\nChoisis le capital de départ (plus = meilleur départ) :`,
+    choices:[
+      {t:`Budget minimum (${fmt(sec.startMin)})`,fn:'createBizMin'},
+      {t:`Budget moyen (${fmt(Math.round((sec.startMin+sec.startMax)/2))})`,fn:'createBizMed'},
+      {t:`Budget max (${fmt(sec.startMax)})`,fn:'createBizMax'},
+      {t:'Annuler',e:{}},
+    ]
+  });
+}
+
+function ouvrirModalProduit(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(!e)return;
+  const secId=e.secteur.id;
+  const produitsCat=PRODUITS_SECTEUR[secId]||PRODUITS_SECTEUR.conseil;
+  const dispo=produitsCat.filter(p=>!e.produits.find(ep=>ep.nom===p.nom));
+  if(!dispo.length){showNotif('Catalogue complet','Tous les produits sont déjà dans ta gamme.','info');return;}
+  const fourn=genFournisseur(secId);
+  window._pendingBizId=bizId;
+  window._pendingFourn=fourn;
+  showModal({
+    title:`🏭 Nouveau produit — ${e.secteur.icon} ${e.secteur.name}`,
+    desc:`Fournisseur: ${fourn.nom}\nQualité: ${fourn.qualite}% · Prix unitaire: ×${fourn.prixMulti.toFixed(2)} du coût de base\n\nChoisis un produit :`,
+    choices:[
+      ...dispo.slice(0,8).map((p,i)=>({
+        t:`${p.icon} ${p.nom} — Coût: ${fmt(Math.round(p.coutBase*fourn.prixMulti))} · Prix suggéré: ${fmt(p.prixBase)}`,
+        fn:'addProduitSecteur', data:{secId, prodNom:p.nom, fourn}
+      })),
+      {t:'Annuler',e:{}}
+    ]
+  });
+}
+
+function chercherFinancement(secId){
+  const sec=SECTORS.find(s=>s.id===secId);
+  const montant=rng(sec.startMin,sec.startMax);
+  const chance=Math.min(0.75,(G.intelligence/100)*0.4+(G.charisme/100)*0.3+0.2);
+  showModal({
+    title:'💼 Chercher financement — '+sec.name,
+    desc:`Présenter ton projet à des investisseurs/banques.\nMontant visé: ${fmt(montant)}\nChance de succès: ${Math.round(chance*100)}%\n\nType de financement:`,
+    choices:[
+      {t:'🏦 Prêt bancaire (remboursement sur 5 ans)',fn:'financBanque',data:{sec:secId,montant,chance}},
+      {t:'👼 Business Angels (cède 20% capital)',fn:'financAngels',data:{sec:secId,montant:montant*1.5,chance}},
+      {t:'💰 Fonds d\'amorçage (cède 30%)',fn:'financFonds',data:{sec:secId,montant:montant*2,chance:chance*0.8}},
+      {t:'Annuler',e:{}},
+    ]
+  });
+}
+
+function ajouterVehFonction(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  const v=_vehicles.filter(x=>x.cat==='Voiture'&&x.price<80000);
+  if(!v.length)return;
+  const chosen=v[rng(0,Math.min(4,v.length-1))];
+  if(e.tresorerie<chosen.price){showNotif('Trésorerie insuffisante',`${fmt(chosen.price)} requis`,'warn');return;}
+  e.tresorerie-=chosen.price;
+  e.vehiculesFonction.push({name:chosen.name,price:chosen.price});
+  addLog(G.age,`🚗 Voiture de fonction: ${chosen.name} (déductible IS)`,'good');
+  renderAll();
+}
+
+function acheterImmoEntreprise(bizId){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  const prix=rng(80000,500000);
+  if(e.tresorerie<prix*0.20){showNotif('Trésorerie insuffisante',`Apport 20%: ${fmt(prix*0.20)}`,'warn');return;}
+  e.tresorerie-=prix*0.20;
+  e.dette+=prix*0.80;
+  e.immoEntreprise.push({name:'Bureau/Local commercial',valeur:prix,amort:prix/20});
+  addLog(G.age,`🏢 ${e.nom} achète local: ${fmt(prix)} (déductible IS)`,'good');
+  renderAll();
+}
+
+function supprimerProduit(bizId,idx){
+  const e=G.entreprises.find(x=>x.id===bizId);
+  if(e){e.produits.splice(idx,1);addLog(G.age,'Produit supprimé de '+e.nom);}
+  renderAll();
+}
+
+// resolveModal enhancements
+const _base_resolve=window.resolveModal;
+window.resolveModal=function(idx){
+  const c=_modalChoices[idx];
+  if(!c)return;
+  if(c.fn==='createBizMin'||c.fn==='createBizMed'||c.fn==='createBizMax'){
+    const sec=SECTORS.find(s=>s.id===window._pendingBizSec);
+    const amounts={createBizMin:sec.startMin,createBizMed:Math.round((sec.startMin+sec.startMax)/2),createBizMax:sec.startMax};
+    const capital=amounts[c.fn];
+    if(G.argent<capital){showNotif('Fonds insuffisants',`Besoin: ${fmt(capital)}`,'warn');closeModal();return;}
+    G.argent-=capital;
+    const biz=createBizObj(sec.id,G.nom+' '+sec.name.split('/')[0].trim()+' SAS',capital);
+    if(G.holding)biz.holdingId=G.holding.id;
+    G.entreprises.push(biz);
+    G.job=null;G.salaireBrut=0;
+    addLog(G.age,`🚀 Création ${biz.nom} (capital: ${fmt(capital)})`,'good');
+    closeModal();renderAll();return;
+  }
+  if(c.fn==='addProduitSecteur'){
+    const e=G.entreprises.find(x=>x.id===window._pendingBizId);
+    if(e&&e.produits.length<5){
+      const {secId,prodNom,fourn}=c.data;
+      const prodsCat=PRODUITS_SECTEUR[secId]||PRODUITS_SECTEUR.conseil;
+      const modele=prodsCat.find(p=>p.nom===prodNom);
+      if(modele){
+        const coutUnit=Math.round(modele.coutBase*fourn.prixMulti);
+        const prod={
+          nom:modele.nom, icon:modele.icon,
+          prixVente:modele.prixBase, prixBase:modele.prixBase,
+          coutUnit, qty:rng(200,3000),
+          marketing:rng(1000,15000),
+          fournisseur:{...fourn},
+        };
+        e.produits.push(prod);
+        addLog(G.age,`🏭 Nouveau produit: ${prod.nom} (PV: ${fmt(prod.prixVente)} · Coût: ${fmt(coutUnit)})`,'good');
+      }
+    }
+    closeModal();renderAll();return;
+  }
+  if(c.fn==='addProduit'){
+    // legacy fallback
+    closeModal();renderAll();return;
+  }
+  if(c.fn==='financBanque'||c.fn==='financAngels'||c.fn==='financFonds'){
+    const {sec,montant,chance}=c.data;
+    if(Math.random()<chance){
+      const biz=createBizObj(sec,G.nom+' '+SECTORS.find(s=>s.id===sec).name.split('/')[0]+' SAS',montant);
+      biz.tresorerie=montant*0.7;
+      if(c.fn==='financBanque')biz.dette=montant;
+      if(G.holding)biz.holdingId=G.holding.id;
+      G.entreprises.push(biz);
+      G.job=null;G.salaireBrut=0;
+      addLog(G.age,`✅ Financement obtenu: ${fmt(montant)} pour ${biz.nom}`,'good');
+    } else addLog(G.age,'❌ Financement refusé par les investisseurs','bad');
+    closeModal();renderAll();return;
+  }
+  if(c.fn==='doBizLoan'){
+    const {id,montant}=c.data;
+    const e=G.entreprises.find(x=>x.id===id);
+    if(e&&Math.random()<0.75){ e.tresorerie+=montant; e.dette+=montant; addLog(G.age,`🏦 Emprunt accordé: ${fmt(montant)}`,'good'); }
+    else addLog(G.age,'🏦 Emprunt refusé','bad');
+    closeModal();renderAll();return;
+  }
+  if(typeof _base_resolve==='function') _base_resolve.call(this,idx);
+  else{
+    const c2=_modalChoices[idx];
+    if(!c2)return;
+    closeModal();
+    if(c2.e){if(c2.e.argent)G.argent+=c2.e.argent;if(c2.e.sante)G.sante=clamp(G.sante+c2.e.sante);if(c2.e.bonheur)G.bonheur=clamp(G.bonheur+c2.e.bonheur);if(c2.e.intelligence)G.intelligence=clamp(G.intelligence+c2.e.intelligence,0,100);if(c2.e.karma)G.karma=clamp(G.karma+c2.e.karma);if(c2.e.charisme)G.charisme=clamp(G.charisme+c2.e.charisme,0,100);}
+    if(G.sante<=0||G.age>=95)gameOver();else renderAll();
+  }
+};
+
+// ══════════════════════════════════════════════════════════
+//  VITAFORGE 2.0 — INIT & START SCREEN
+// ══════════════════════════════════════════════════════════
+
+window._selectedCity = 'caen';
+
+document.addEventListener('DOMContentLoaded', function() {
+  // City is fixed to Caen - no selection grid needed
+});
+
+// ── PRODUITS PAR SECTEUR ──────────────────────────────────
+const PRODUITS_SECTEUR = {
+  resto:[
+    {nom:'Pinte de bière',icon:'🍺',prixBase:6,coutBase:1.2},{nom:'Demi de bière',icon:'🍻',prixBase:4,coutBase:0.8},
+    {nom:'Mojito',icon:'🍹',prixBase:10,coutBase:2},{nom:'Formule déjeuner',icon:'🍽️',prixBase:15,coutBase:5},
+    {nom:'Plat du jour',icon:'🥘',prixBase:14,coutBase:4.5},{nom:'Pizza maison',icon:'🍕',prixBase:13,coutBase:3},
+    {nom:'Burger signature',icon:'🍔',prixBase:12,coutBase:3.5},{nom:'Dessert maison',icon:'🍰',prixBase:7,coutBase:1.5},
+    {nom:'Bouteille vin',icon:'🍷',prixBase:25,coutBase:8},{nom:'Café/Expresso',icon:'☕',prixBase:3,coutBase:0.3},
+  ],
+  club:[
+    {nom:'Pinte premium',icon:'🍺',prixBase:9,coutBase:1.5},{nom:'Cocktail signature',icon:'🍸',prixBase:14,coutBase:3},
+    {nom:'Bouteille champagne VIP',icon:'🍾',prixBase:200,coutBase:60},{nom:'Shot vodka',icon:'🥃',prixBase:6,coutBase:0.8},
+    {nom:'Entrée soirée',icon:'🎟️',prixBase:20,coutBase:0},{nom:'Table VIP (nuit)',icon:'🛋️',prixBase:500,coutBase:50},
+    {nom:'Chicha (bar chicha)',icon:'💨',prixBase:25,coutBase:8},{nom:'Eau minérale',icon:'💧',prixBase:4,coutBase:0.5},
+    {nom:'Energy drink',icon:'⚡',prixBase:7,coutBase:1.2},{nom:'Bouteille whisky',icon:'🥃',prixBase:150,coutBase:40},
+  ],
+  tech:[
+    {nom:'Licence logiciel /an',icon:'💻',prixBase:1200,coutBase:50},{nom:'Application mobile',icon:'📱',prixBase:5000,coutBase:500},
+    {nom:'Formation en ligne',icon:'🎓',prixBase:300,coutBase:20},{nom:'Audit cybersécurité',icon:'🔐',prixBase:3000,coutBase:800},
+    {nom:'API SaaS /mois',icon:'🔌',prixBase:99,coutBase:15},{nom:'Intégration IA',icon:'🤖',prixBase:8000,coutBase:2000},
+    {nom:'Cloud hosting /an',icon:'☁️',prixBase:2400,coutBase:600},{nom:'Site e-commerce clé en main',icon:'🛍️',prixBase:4500,coutBase:1200},
+    {nom:'Support premium /an',icon:'🛠️',prixBase:1800,coutBase:400},{nom:'Tableau de bord analytics',icon:'📊',prixBase:2000,coutBase:300},
+  ],
+  retail:[
+    {nom:'T-shirt marque propre',icon:'👕',prixBase:35,coutBase:7},{nom:'Sneakers',icon:'👟',prixBase:120,coutBase:35},
+    {nom:'Accessoire mode',icon:'👜',prixBase:60,coutBase:15},{nom:'Produit alimentaire bio',icon:'🥗',prixBase:8,coutBase:2.5},
+    {nom:'Boisson énergisante',icon:'🥤',prixBase:3,coutBase:0.6},{nom:'Gadget maison',icon:'🏠',prixBase:45,coutBase:12},
+    {nom:'Cosmétique naturel',icon:'💄',prixBase:28,coutBase:6},{nom:'Livre best-seller',icon:'📚',prixBase:18,coutBase:6},
+    {nom:'Jeu de société',icon:'🎲',prixBase:35,coutBase:10},{nom:'Équipement sport',icon:'⚽',prixBase:80,coutBase:22},
+  ],
+  btp:[
+    {nom:'Rénovation salle de bain',icon:'🚿',prixBase:8000,coutBase:3500},{nom:'Pose parquet',icon:'🪵',prixBase:3500,coutBase:1200},
+    {nom:'Peinture appartement',icon:'🖌️',prixBase:2500,coutBase:600},{nom:'Installation cuisine',icon:'🍳',prixBase:12000,coutBase:5000},
+    {nom:'Isolation thermique',icon:'🌡️',prixBase:6000,coutBase:2500},{nom:'Extension maison',icon:'🏗️',prixBase:50000,coutBase:25000},
+    {nom:'Toiture complète',icon:'🏠',prixBase:15000,coutBase:7000},{nom:'Terrassement jardin',icon:'🌿',prixBase:5000,coutBase:2000},
+    {nom:'Carrelage sol',icon:'⬜',prixBase:4000,coutBase:1500},{nom:'Plomberie complète',icon:'🔧',prixBase:7000,coutBase:3000},
+  ],
+  conseil:[
+    {nom:'Mission conseil stratégique',icon:'📊',prixBase:15000,coutBase:3000},{nom:'Audit comptable',icon:'🔢',prixBase:3500,coutBase:800},
+    {nom:'Formation management',icon:'🎓',prixBase:2000,coutBase:400},{nom:'Due diligence M&A',icon:'🔍',prixBase:20000,coutBase:5000},
+    {nom:'Diagnostic RH',icon:'👥',prixBase:5000,coutBase:1200},{nom:'Transformation digitale',icon:'💻',prixBase:25000,coutBase:6000},
+    {nom:'Étude de marché',icon:'📈',prixBase:8000,coutBase:2000},{nom:'Plan de restructuration',icon:'🏗️',prixBase:30000,coutBase:8000},
+    {nom:'Coaching dirigeant',icon:'🎯',prixBase:4000,coutBase:800},{nom:'Rapport d\'évaluation',icon:'📋',prixBase:6000,coutBase:1500},
+  ],
+  immo:[
+    {nom:'Location gestion locative',icon:'🏠',prixBase:1200,coutBase:200},{nom:'Transaction vente',icon:'🏡',prixBase:12000,coutBase:2000},
+    {nom:'Estimation immobilière',icon:'📋',prixBase:300,coutBase:50},{nom:'Gestion copropriété /an',icon:'🏢',prixBase:1500,coutBase:400},
+    {nom:'Home staging',icon:'🛋️',prixBase:2500,coutBase:800},{nom:'Visite virtuelle 3D',icon:'🎥',prixBase:500,coutBase:100},
+    {nom:'Mandat exclusif',icon:'🔑',prixBase:8000,coutBase:1500},{nom:'Portage salarial agent',icon:'💼',prixBase:600,coutBase:150},
+    {nom:'Bail commercial réd.',icon:'⚖️',prixBase:1500,coutBase:300},{nom:'Pack investisseur',icon:'📊',prixBase:5000,coutBase:1200},
+  ],
+  cosm:[
+    {nom:'Crème visage premium',icon:'✨',prixBase:55,coutBase:12},{nom:'Parfum maison',icon:'🌸',prixBase:90,coutBase:20},
+    {nom:'Sérum anti-âge',icon:'💧',prixBase:75,coutBase:15},{nom:'Shampoing naturel',icon:'🌿',prixBase:18,coutBase:4},
+    {nom:'Palette maquillage',icon:'🎨',prixBase:45,coutBase:10},{nom:'Huile corps luxe',icon:'💎',prixBase:65,coutBase:14},
+    {nom:'Masque hydratant',icon:'😌',prixBase:28,coutBase:6},{nom:'Coffret cadeau',icon:'🎁',prixBase:120,coutBase:30},
+    {nom:'Vernis à ongles',icon:'💅',prixBase:12,coutBase:2.5},{nom:'Fond de teint',icon:'🪞',prixBase:38,coutBase:8},
+  ],
+  pharma:[
+    {nom:'Complément alimentaire',icon:'💊',prixBase:25,coutBase:5},{nom:'Médicament générique',icon:'💉',prixBase:8,coutBase:1.5},
+    {nom:'Test diagnostic rapide',icon:'🔬',prixBase:15,coutBase:3},{nom:'Matériel médical',icon:'🏥',prixBase:120,coutBase:35},
+    {nom:'Vaccin saisonnier',icon:'💉',prixBase:30,coutBase:8},{nom:'Crème dermatologique',icon:'🧴',prixBase:18,coutBase:4},
+    {nom:'Spray nasal',icon:'👃',prixBase:12,coutBase:2.5},{nom:'Vitamine complexe',icon:'🌟',prixBase:20,coutBase:4.5},
+    {nom:'Pansement intelligent',icon:'🩹',prixBase:8,coutBase:1.8},{nom:'Antiseptique',icon:'🧪',prixBase:6,coutBase:1.2},
+  ],
+  auto:[
+    {nom:'Révision complète',icon:'🔧',prixBase:400,coutBase:150},{nom:'Pneu 4 saisons',icon:'🔄',prixBase:500,coutBase:200},
+    {nom:'Batterie voiture élec.',icon:'⚡',prixBase:2500,coutBase:900},{nom:'Option personnalisation',icon:'🎨',prixBase:3000,coutBase:800},
+    {nom:'Contrat entretien /an',icon:'📋',prixBase:800,coutBase:250},{nom:'Accessoires auto',icon:'🚗',prixBase:250,coutBase:70},
+    {nom:'Kit carrosserie sport',icon:'💨',prixBase:1800,coutBase:600},{nom:'Système audio haut-de-gamme',icon:'🔊',prixBase:1200,coutBase:400},
+    {nom:'Tapis sur-mesure',icon:'🪑',prixBase:350,coutBase:100},{nom:'Vitres teintées',icon:'🕶️',prixBase:600,coutBase:180},
+  ],
+  robot:[
+    {nom:'Robot bras industriel',icon:'🤖',prixBase:45000,coutBase:18000},{nom:'Drone surveillance',icon:'🚁',prixBase:8000,coutBase:2500},
+    {nom:'Logiciel IA embarquée',icon:'🧠',prixBase:12000,coutBase:3000},{nom:'Capteur industriel IoT',icon:'📡',prixBase:800,coutBase:200},
+    {nom:'Maintenance robot /an',icon:'🔧',prixBase:5000,coutBase:1500},{nom:'Formation utilisation',icon:'🎓',prixBase:2000,coutBase:500},
+    {nom:'Intégration usine',icon:'🏭',prixBase:30000,coutBase:10000},{nom:'Module pick & place',icon:'📦',prixBase:15000,coutBase:5000},
+    {nom:'Robot agricole',icon:'🌾',prixBase:25000,coutBase:9000},{nom:'Exosquelette pro',icon:'💪',prixBase:60000,coutBase:22000},
+  ],
+  it:[
+    {nom:'Serveur rack 1U',icon:'🖥️',prixBase:3500,coutBase:1200},{nom:'Switch réseau 48 ports',icon:'🔌',prixBase:1800,coutBase:600},
+    {nom:'NAS 4 baies',icon:'💾',prixBase:800,coutBase:280},{nom:'Station de travail pro',icon:'💻',prixBase:2500,coutBase:900},
+    {nom:'UPS batterie de secours',icon:'⚡',prixBase:600,coutBase:200},{nom:'Câblage réseau cat8',icon:'🔗',prixBase:1200,coutBase:350},
+    {nom:'Licence antivirus entreprise',icon:'🛡️',prixBase:400,coutBase:100},{nom:'GPU IA compute',icon:'🎮',prixBase:6000,coutBase:2500},
+    {nom:'Routeur firewall pro',icon:'🔥',prixBase:1500,coutBase:500},{nom:'Stockage NVMe professionnel',icon:'💿',prixBase:900,coutBase:300},
+  ],
+};
+// Default fallback
+SECTORS.forEach(s=>{ if(!PRODUITS_SECTEUR[s.id]) PRODUITS_SECTEUR[s.id]=PRODUITS_SECTEUR.conseil; });
+
+const FOURNISSEURS_NOMS = ['Alibaba Direct','Groupe Sigma','Euro Supply Co.','FastLogistic','MedPro Distribution',
+  'TechParts EU','BioIngredients SA','ChemPro France','MetalWorks SAS','AgriPlus','PrintMaster','FoodSource Pro'];
+
+function genFournisseur(secId){
+  const nom=FOURNISSEURS_NOMS[rng(0,FOURNISSEURS_NOMS.length-1)]+' '+rng(1,99);
+  return {
+    nom, relation:50,
+    prixMulti:0.7+Math.random()*0.6, // 0.7x à 1.3x du prix base
+    qualite:rng(40,95),
+    fiabilite:rng(60,98),
+  };
+}
+
+SECTORS.forEach(s => {
+  if(!s.stockItems) {
+    s.stockItems = [
+      {nom:'Matières premières',unitCost:50,consumePerMonth:20},
+      {nom:'Fournitures',unitCost:10,consumePerMonth:50},
+      {nom:'Consommables',unitCost:5,consumePerMonth:80},
+    ];
+  }
+});
+
+// Sector risks/opps defaults
+SECTORS.forEach(s => {
+  if(!s.risks) s.risks = ['Incident opérationnel','Perte client majeur'];
+  if(!s.opps) s.opps = ['Contrat important','Nouveau marché'];
+});
+
+
+</script>
+</body>
+</html>
+HTMLEOF
